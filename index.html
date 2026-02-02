@@ -1,78 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>$COMPASS - Direction Is A Choice | Captain Jack Terminal</title>
-  <meta name="description" content="The compass is broken. You decide where it points. Official terminal for $COMPASS coin.">
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Pirata+One&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary-gold: #d4af37;
-      --terminal-green: #00ff41;
-      --dark-blue: #0a0e27;
-      --darker-blue: #050811;
-      --accent-red: #ff3366;
-      --text-white: #e0e0e0;
-    }
-
-    body {
-      font-family: 'Orbitron', monospace;
-      background: linear-gradient(135deg, var(--darker-blue) 0%, var(--dark-blue) 100%);
-      color: var(--text-white);
-      line-height: 1.6;
-    }
-
-    #terminal {
-      font-family: monospace;
-      color: #00ffcc;
-      font-size: 16px;
-      line-height: 1.6;
-      white-space: pre-line;
-      padding: 40px;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div id="terminal"></div>
-
-  <script>
-    const lines = [
-      "> The compass is broken.",
-      "> simplicity --intentional",
-      "> if the compass is broken, who do you follow?",
-      "> YOU decide the value.",
-      "> follow the signal"
-    ];
-
-    const terminal = document.getElementById("terminal");
-    let index = 0;
-
-    function writeLine() {
-      if (index < lines.length) {
-        terminal.innerHTML += lines[index] + "<br>";
-        index++;
-        setTimeout(writeLine, 700);
-      }
-    }
-
-    writeLine();
-  </script>
-
-</body>
-</html>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$COMPASS - Direction Is A Choice | Captain Jack Terminal</title>
+    <meta name="description" content="The compass is broken. You decide where it points. Official terminal for $COMPASS coin.">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Pirata+One&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         :root {
@@ -83,30 +23,6 @@
             --accent-red: #ff3366;
             --text-white: #e0e0e0;
         }
-
-        <script>
-  const lines = [
-    "> The compass is broken.",
-    "> simplicity --intentional",
-    "> if the compass is broken, who do you follow?",
-    "> YOU decide the value.",
-    "> follow the signal"
-  ];
-
-  const terminal = document.getElementById("terminal");
-  let index = 0;
-
-  function writeLine() {
-    if (index < lines.length) {
-      terminal.innerHTML += lines[index] + "<br>";
-      index++;
-      setTimeout(writeLine, 700);
-    }
-  }
-
-  writeLine();
-</script>
-
         
         body {
             font-family: 'Orbitron', monospace;
@@ -114,8 +30,6 @@
             color: var(--text-white);
             overflow-x: hidden;
             line-height: 1.6;
-            <div id="terminal"></div>
-
         }
         
         /* Animated Background */
