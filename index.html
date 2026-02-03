@@ -240,340 +240,166 @@
         
         /* Hero Section */
         .hero {
-            min-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 0 60px;
+        }
+        
+        .hero h1 {
+            font-family: 'Pirata One', 'Georgia', cursive;
+            font-size: 4rem;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px var(--terminal-green);
+            letter-spacing: 4px;
+        }
+        
+        .hero .tagline {
+            font-size: 1.5rem;
+            color: var(--terminal-green);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-white);
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+        
+        /* Compass Section */
+        .compass-section {
+            text-align: center;
+            padding: 60px 0;
             position: relative;
         }
         
         .compass-container {
-            width: 200px;
-            height: 200px;
-            margin-bottom: 40px;
+            max-width: 500px;
+            margin: 0 auto 40px;
             position: relative;
-            animation: float 6s ease-in-out infinite;
-            will-change: transform;
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .compass {
+        .compass-svg {
             width: 100%;
-            height: 100%;
-            border: 3px solid var(--primary-gold);
-            border-radius: 50%;
-            position: relative;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-            box-shadow: 
-                0 0 30px rgba(0, 255, 65, 0.3),
-                inset 0 0 30px rgba(212, 175, 55, 0.2);
+            max-width: 400px;
+            height: auto;
+            filter: drop-shadow(0 0 20px var(--terminal-green));
         }
         
-        .compass-needle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 4px;
-            height: 80px;
-            background: linear-gradient(to bottom, var(--accent-red) 0%, var(--terminal-green) 100%);
-            transform-origin: 50% 90%;
-            transform: translate(-50%, -90%) rotate(0deg);
-            animation: spin 4s linear infinite;
-            will-change: transform;
+        .compass-svg .needle {
+            transform-origin: center;
+            animation: compassSpin 4s ease-in-out infinite;
         }
         
-        @keyframes spin {
-            0% { transform: translate(-50%, -90%) rotate(0deg); }
-            100% { transform: translate(-50%, -90%) rotate(360deg); }
+        @keyframes compassSpin {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
         }
         
-        .compass-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
+        .spin-button {
             background: var(--primary-gold);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px var(--primary-gold);
-        }
-        
-        .compass-directions {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            font-family: 'Pirata One', 'Georgia', cursive;
-            font-size: 1.2rem;
-            color: var(--primary-gold);
-        }
-        
-        .compass-n, .compass-s, .compass-e, .compass-w {
-            position: absolute;
-            transform: translate(-50%, -50%);
-        }
-        
-        .compass-n { top: 10px; left: 50%; }
-        .compass-s { bottom: 10px; left: 50%; transform: translate(-50%, 50%); }
-        .compass-e { right: 10px; top: 50%; transform: translate(50%, -50%); }
-        .compass-w { left: 10px; top: 50%; transform: translate(-50%, -50%); }
-        
-        .hero-title {
-            font-family: 'Pirata One', 'Georgia', cursive;
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: var(--primary-gold);
-            text-shadow: 
-                0 0 20px var(--terminal-green),
-                0 0 40px var(--terminal-green);
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 20px var(--terminal-green), 0 0 40px var(--terminal-green); }
-            to { text-shadow: 0 0 30px var(--terminal-green), 0 0 60px var(--terminal-green); }
-        }
-        
-        .hero-subtitle {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--terminal-green);
-        }
-        
-        .hero-tagline {
-            font-size: 1.1rem;
-            margin-bottom: 40px;
-            font-style: italic;
-            color: var(--text-white);
-            opacity: 0.9;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .btn {
+            color: var(--dark-blue);
+            border: none;
             padding: 15px 40px;
-            font-family: 'Orbitron', 'Arial', sans-serif;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', 'Arial', 'Helvetica', sans-serif;
             font-weight: 700;
-            border: 2px solid;
-            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-primary {
-            background: var(--primary-gold);
-            color: var(--darker-blue);
-            border-color: var(--primary-gold);
-        }
-        
-        .btn-primary:hover {
-            background: transparent;
-            color: var(--primary-gold);
-            box-shadow: 0 0 20px var(--primary-gold);
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            color: var(--terminal-green);
-            border-color: var(--terminal-green);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--terminal-green);
-            color: var(--darker-blue);
-            box-shadow: 0 0 20px var(--terminal-green);
-        }
-        
-        /* Sections */
-        section {
-            padding: 80px 20px;
-        }
-        
-        .section-title {
-            font-family: 'Pirata One', 'Georgia', cursive;
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--primary-gold);
-            text-shadow: 0 0 20px var(--terminal-green);
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 60px;
-            color: var(--terminal-green);
-        }
-        
-        /* About Section */
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-            font-size: 1.1rem;
-            line-height: 1.8;
-        }
-        
-        .about-content p {
-            margin-bottom: 20px;
-        }
-        
-        .highlight {
-            color: var(--primary-gold);
-            font-weight: 700;
-        }
-        
-        /* Tokenomics Section */
-        .tokenomics {
-            background: rgba(10, 14, 39, 0.5);
-        }
-        
-        .token-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        .token-card {
-            background: rgba(0, 255, 65, 0.05);
-            border: 2px solid var(--terminal-green);
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .token-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
-            border-color: var(--primary-gold);
-        }
-        
-        .token-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        
-        .token-label {
-            font-size: 0.9rem;
-            color: var(--terminal-green);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .token-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-gold);
-        }
-        
-        /* How to Buy Section */
-        .steps-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .step {
-            background: rgba(0, 255, 65, 0.05);
-            border-left: 4px solid var(--terminal-green);
-            padding: 25px;
-            margin-bottom: 20px;
             border-radius: 5px;
             transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
         
-        .step:hover {
-            border-left-color: var(--primary-gold);
-            background: rgba(212, 175, 55, 0.05);
-        }
-        
-        .step-number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
+        .spin-button:hover {
             background: var(--terminal-green);
-            color: var(--darker-blue);
-            border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .direction-result {
+            margin-top: 30px;
+            font-size: 2rem;
             font-weight: 700;
-            margin-right: 15px;
-            font-size: 1.2rem;
-        }
-        
-        .step-title {
-            font-size: 1.3rem;
             color: var(--primary-gold);
-            margin-bottom: 10px;
-        }
-        
-        .step-description {
-            color: var(--text-white);
-            line-height: 1.6;
+            text-shadow: 0 0 15px var(--terminal-green);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         /* Terminal Section */
         .terminal-section {
-            background: rgba(5, 8, 17, 0.8);
+            padding: 60px 0;
         }
         
-        .terminal-window {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #000;
+        .section-title {
+            font-family: 'Pirata One', 'Georgia', cursive;
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px var(--terminal-green);
+        }
+        
+        .terminal {
+            background: rgba(0, 0, 0, 0.8);
             border: 2px solid var(--terminal-green);
             border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
             overflow: hidden;
-            box-shadow: 0 10px 50px rgba(0, 255, 65, 0.3);
         }
         
         .terminal-header {
-            background: var(--terminal-green);
-            padding: 10px 15px;
+            background: rgba(0, 255, 65, 0.1);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--terminal-green);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .terminal-button {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: var(--darker-blue);
+            background: var(--accent-red);
         }
         
+        .terminal-button:nth-child(2) { background: #ffd700; }
+        .terminal-button:nth-child(3) { background: var(--terminal-green); }
+        
         .terminal-title {
-            margin-left: 10px;
-            color: var(--darker-blue);
+            flex: 1;
+            text-align: center;
+            color: var(--terminal-green);
             font-size: 0.9rem;
-            font-weight: 700;
         }
         
         .terminal-body {
             padding: 20px;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 0.95rem;
-            color: var(--terminal-green);
-            min-height: 400px;
-            max-height: 600px;
-            overflow-y: auto;
+            line-height: 1.5;
+        }
+        
+        .terminal-body::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--terminal-green);
+            border-radius: 5px;
         }
         
         .terminal-line {
@@ -582,7 +408,7 @@
         
         .terminal-prompt {
             color: var(--primary-gold);
-            font-weight: 700;
+            font-weight: bold;
         }
         
         .terminal-text {
@@ -594,7 +420,7 @@
         }
         
         .terminal-warning {
-            color: #ffcc00;
+            color: #ffd700;
         }
         
         .terminal-error {
@@ -604,23 +430,22 @@
         .terminal-input-line {
             display: flex;
             align-items: center;
-            margin-top: 10px;
+            gap: 5px;
         }
         
         .terminal-input-prompt {
-            color: var(--primary-gold);
-            margin-right: 10px;
-            font-weight: 700;
+            color: var(--terminal-green);
+            font-weight: bold;
         }
         
         #terminalInput {
             flex: 1;
             background: transparent;
             border: none;
-            outline: none;
             color: var(--terminal-green);
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 0.95rem;
+            outline: none;
         }
         
         .cursor {
@@ -628,80 +453,197 @@
             width: 8px;
             height: 16px;
             background: var(--terminal-green);
-            animation: cursorBlink 1s infinite;
+            animation: blink 1s infinite;
         }
         
-        @keyframes cursorBlink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
+        /* Tokenomics Section */
+        .tokenomics {
+            padding: 60px 0;
         }
         
-        /* Community Section */
-        .social-links {
-            display: flex;
-            justify-content: center;
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 30px;
-            flex-wrap: wrap;
             margin-top: 40px;
         }
         
-        .social-link {
+        .token-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--terminal-green);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .token-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(0, 255, 65, 0.3);
+            border-color: var(--primary-gold);
+        }
+        
+        .token-card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .token-card h3 {
+            color: var(--primary-gold);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .token-card p {
+            color: var(--text-white);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* How to Buy Section */
+        .how-to-buy {
+            padding: 60px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .step {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gold);
+            color: var(--dark-blue);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 15px 30px;
-            background: rgba(0, 255, 65, 0.05);
-            border: 2px solid var(--terminal-green);
-            border-radius: 50px;
-            color: var(--terminal-green);
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-        }
-        
-        .social-link:hover {
-            background: var(--terminal-green);
-            color: var(--darker-blue);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.4);
-        }
-        
-        .social-icon {
+            justify-content: center;
             font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        
+        .step h3 {
+            color: var(--terminal-green);
+            margin-bottom: 10px;
+        }
+        
+        .step p {
+            color: var(--text-white);
+            font-size: 0.9rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 0;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .cta-button {
+            background: var(--primary-gold);
+            color: var(--dark-blue);
+            padding: 15px 40px;
+            border: none;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', 'Arial', 'Helvetica', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            background: var(--terminal-green);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .cta-button.secondary {
+            background: transparent;
+            color: var(--terminal-green);
+            border: 2px solid var(--terminal-green);
+        }
+        
+        .cta-button.secondary:hover {
+            background: var(--terminal-green);
+            color: var(--dark-blue);
         }
         
         /* Footer */
         footer {
-            background: rgba(5, 8, 17, 0.9);
-            padding: 40px 20px;
-            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
             border-top: 2px solid var(--terminal-green);
+            padding: 40px 0 20px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .social-links a {
+            color: var(--terminal-green);
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary-gold);
+            transform: scale(1.2);
         }
         
         .footer-text {
             color: var(--text-white);
-            margin-bottom: 10px;
-        }
-        
-        .footer-warning {
-            color: var(--accent-red);
             font-size: 0.9rem;
-            font-style: italic;
-            margin-top: 20px;
+            opacity: 0.7;
         }
         
-        /* Responsive Design */
+        .disclaimer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 65, 0.3);
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .hero-title {
+            .hero h1 {
                 font-size: 2.5rem;
             }
             
-            .hero-subtitle {
+            .hero .tagline {
                 font-size: 1.2rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
             }
             
             .nav-links {
@@ -709,63 +651,41 @@
                 gap: 15px;
             }
             
-            .compass-container {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .token-grid {
+            .token-grid,
+            .steps {
                 grid-template-columns: 1fr;
             }
             
-            .hero-buttons {
+            .cta-buttons {
                 flex-direction: column;
-                width: 100%;
+                align-items: center;
             }
             
-            .btn {
-                width: 100%;
+            .compass-svg {
+                max-width: 300px;
             }
-        }
-        
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--darker-blue);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--terminal-green);
-            border-radius: 5px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-gold);
         }
     </style>
 </head>
 <body>
+    <!-- Scanlines Effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrixRain"></canvas>
+    
     <!-- Boot Sequence -->
     <div class="boot-sequence">
         <div class="boot-content">
-            <div class="boot-logo">⚓ CAPTAIN JACK TERMINAL ⚓</div>
-            <div class="boot-line">Initializing blockchain interface... <span class="boot-ok">[OK]</span></div>
-            <div class="boot-line">Loading compass protocols... <span class="boot-ok">[OK]</span></div>
-            <div class="boot-line">Checking rum supplies... <span class="boot-ok">[LOW]</span></div>
-            <div class="boot-line">Connecting to Solana mainnet... <span class="boot-ok">[OK]</span></div>
-            <div class="boot-line boot-final">Press any key to begin your journey...</div>
+            <div class="boot-logo">⚓ CAPTAIN JACK'S TERMINAL ⚓</div>
+            <div class="boot-line">> Initializing $COMPASS system... <span class="boot-ok">[OK]</span></div>
+            <div class="boot-line">> Loading pirate protocols... <span class="boot-ok">[OK]</span></div>
+            <div class="boot-line">> Breaking compass... <span class="boot-ok">[OK]</span></div>
+            <div class="boot-line">> Disabling navigation systems... <span class="boot-ok">[OK]</span></div>
+            <div class="boot-line boot-final">> Press ANY key to begin your voyage_</div>
         </div>
     </div>
-
-    <!-- Scanlines Effect -->
-    <div class="scanlines"></div>
-
-    <!-- Matrix Rain Background -->
-    <canvas id="matrixRain"></canvas>
-
+    
     <!-- Header -->
     <header>
         <div class="nav-container">
@@ -778,210 +698,178 @@
                 </svg>
                 $COMPASS
             </div>
-            <ul class="nav-links">
-                <li><a href="#about">About</a></li>
-                <li><a href="#tokenomics">Tokenomics</a></li>
-                <li><a href="#how-to-buy">How to Buy</a></li>
-                <li><a href="#terminal">Terminal</a></li>
-                <li><a href="#community">Community</a></li>
-            </ul>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#terminal">Terminal</a></li>
+                    <li><a href="#tokenomics">Tokenomics</a></li>
+                    <li><a href="#buy">How to Buy</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
-
+    
     <!-- Hero Section -->
     <section class="hero">
-        <div class="compass-container">
-            <div class="compass">
-                <div class="compass-needle"></div>
-                <div class="compass-center"></div>
-                <div class="compass-directions">
-                    <span class="compass-n">N</span>
-                    <span class="compass-e">E</span>
-                    <span class="compass-s">S</span>
-                    <span class="compass-w">W</span>
-                </div>
-            </div>
-        </div>
-        <h1 class="hero-title">$COMPASS</h1>
-        <h2 class="hero-subtitle">Direction Is A Choice</h2>
-        <p class="hero-tagline">"The compass is broken. You decide where it points."</p>
-        <div class="hero-buttons">
-            <a href="#how-to-buy" class="btn btn-primary">Buy $COMPASS</a>
-            <a href="#terminal" class="btn btn-secondary">Explore Terminal</a>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about">
         <div class="container">
-            <h2 class="section-title">The Philosophy</h2>
-            <p class="section-subtitle">Where compass meets chaos, savvy?</p>
-            <div class="about-content">
-                <p>
-                    In a world obsessed with finding <span class="highlight">THE direction</span>, Captain Jack Sparrow discovered something profound: 
-                    <span class="highlight">the compass was always broken</span>. It didn't point to treasure. It pointed to <span class="highlight">choice</span>.
-                </p>
-                <p>
-                    $COMPASS isn't just another memecoin. It's a philosophy wrapped in blockchain technology. 
-                    While others promise moon, we offer something more valuable: <span class="highlight">uncertainty as freedom</span>.
-                </p>
-                <p>
-                    The needle spins. North, South, East, West—it doesn't matter. What matters is that <span class="highlight">YOU</span> decide. 
-                    That's the treasure. That's the journey. That's $COMPASS.
-                </p>
-                <p style="text-align: center; font-style: italic; margin-top: 30px; color: var(--primary-gold);">
-                    "Not all treasure is silver and gold, mate. Sometimes it's a broken compass that shows you every possibility at once."
-                </p>
-            </div>
+            <h1>$COMPASS</h1>
+            <p class="tagline">Direction Is A Choice</p>
+            <p class="subtitle">The compass is broken. You decide where it points. 🧭</p>
         </div>
     </section>
-
-    <!-- Tokenomics Section -->
-    <section id="tokenomics" class="tokenomics">
+    
+    <!-- Compass Interactive Section -->
+    <section id="about" class="compass-section">
         <div class="container">
-            <h2 class="section-title">Tokenomics</h2>
-            <p class="section-subtitle">The numbers that don't matter (but everyone asks about)</p>
-            <div class="token-grid">
-                <div class="token-card">
-                    <div class="token-icon">🧭</div>
-                    <div class="token-label">Total Supply</div>
-                    <div class="token-value">1 Billion</div>
-                </div>
-                <div class="token-card">
-                    <div class="token-icon">🔥</div>
-                    <div class="token-label">LP Burned</div>
-                    <div class="token-value">100%</div>
-                </div>
-                <div class="token-card">
-                    <div class="token-icon">⚓</div>
-                    <div class="token-label">Contract</div>
-                    <div class="token-value">Renounced</div>
-                </div>
-                <div class="token-card">
-                    <div class="token-icon">🏴‍☠️</div>
-                    <div class="token-label">Tax</div>
-                    <div class="token-value">0/0</div>
-                </div>
+            <h2 class="section-title">Spin The Compass</h2>
+            <div class="compass-container">
+                <svg class="compass-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Outer Ring -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#d4af37" stroke-width="3"/>
+                    
+                    <!-- Cardinal Directions -->
+                    <text x="100" y="25" text-anchor="middle" fill="#00ff41" font-size="16" font-weight="bold">N</text>
+                    <text x="100" y="185" text-anchor="middle" fill="#ff3366" font-size="16" font-weight="bold">S</text>
+                    <text x="25" y="105" text-anchor="middle" fill="#d4af37" font-size="16" font-weight="bold">W</text>
+                    <text x="175" y="105" text-anchor="middle" fill="#d4af37" font-size="16" font-weight="bold">E</text>
+                    
+                    <!-- Center -->
+                    <circle cx="100" cy="100" r="10" fill="#d4af37"/>
+                    
+                    <!-- Needle (will rotate) -->
+                    <g class="needle">
+                        <path d="M100 50 L105 95 L100 100 L95 95 Z" fill="#00ff41"/>
+                        <path d="M100 150 L95 105 L100 100 L105 105 Z" fill="#ff3366"/>
+                    </g>
+                </svg>
             </div>
+            <button class="spin-button" onclick="spinCompass()">SPIN THE COMPASS</button>
+            <div class="direction-result" id="directionResult"></div>
         </div>
     </section>
-
-    <!-- How to Buy Section -->
-    <section id="how-to-buy">
-        <div class="container">
-            <h2 class="section-title">How to Buy</h2>
-            <p class="section-subtitle">Chart your course to $COMPASS</p>
-            <div class="steps-container">
-                <div class="step">
-                    <span class="step-number">1</span>
-                    <h3 class="step-title">Get a Solana Wallet</h3>
-                    <p class="step-description">
-                        Download Phantom, Solflare, or any Solana-compatible wallet. This is your ship for the blockchain seas.
-                    </p>
-                </div>
-                <div class="step">
-                    <span class="step-number">2</span>
-                    <h3 class="step-title">Acquire SOL</h3>
-                    <p class="step-description">
-                        Purchase SOL from your favorite exchange (Coinbase, Binance, Kraken). Transfer it to your wallet.
-                    </p>
-                </div>
-                <div class="step">
-                    <span class="step-number">3</span>
-                    <h3 class="step-title">Connect to DEX</h3>
-                    <p class="step-description">
-                        Visit Raydium or Jupiter and connect your wallet. The compass needle spins toward the DEX...
-                    </p>
-                </div>
-                <div class="step">
-                    <span class="step-number">4</span>
-                    <h3 class="step-title">Swap for $COMPASS</h3>
-                    <p class="step-description">
-                        Paste the $COMPASS contract address, choose your amount, and swap. Now you're sailing with Captain Jack.
-                    </p>
-                </div>
-                <div class="step">
-                    <span class="step-number">5</span>
-                    <h3 class="step-title">Hold or Trade</h3>
-                    <p class="step-description">
-                        The compass is yours. It points wherever you want. North to the moon? East to treasure? The choice is yours, savvy?
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Interactive Terminal Section -->
+    
+    <!-- Terminal Section -->
     <section id="terminal" class="terminal-section">
         <div class="container">
-            <h2 class="section-title">Captain's Terminal</h2>
-            <p class="section-subtitle">Type 'help' to see available commands</p>
-            
-            <div class="terminal-window">
+            <h2 class="section-title">Captain Jack's Terminal</h2>
+            <div class="terminal">
                 <div class="terminal-header">
                     <div class="terminal-button"></div>
                     <div class="terminal-button"></div>
                     <div class="terminal-button"></div>
-                    <div class="terminal-title">captain@terminal:~</div>
+                    <div class="terminal-title">compass_terminal.sh</div>
                 </div>
                 <div class="terminal-body" id="terminalBody">
                     <div class="terminal-line">
                         <span class="terminal-success">
-╔═══════════════════════════════════════════════════════════╗
-║  CAPTAIN JACK'S COMPASS TERMINAL v1.0                     ║
-║  "The compass is broken. You decide where it points."     ║
-╚═══════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════╗
+║  ⚓ WELCOME TO CAPTAIN JACK'S $COMPASS TERMINAL ⚓            ║
+║                                                               ║
+║  The compass is broken. Direction is a choice.                ║
+║  Where you sail is up to you, mate. 🧭                        ║
+║                                                               ║
+║  Type 'help' for available commands                           ║
+╚═══════════════════════════════════════════════════════════════╝
                         </span>
                     </div>
-                    <div class="terminal-line">
-                        <span class="terminal-text">Welcome aboard, mate. Type <span style="color: var(--primary-gold);">help</span> for available commands.</span>
-                    </div>
-                    <div class="terminal-line terminal-input-line">
-                        <span class="terminal-input-prompt">captain@terminal:~$</span>
-                        <input type="text" id="terminalInput" autofocus autocomplete="off">
+                    <div class="terminal-input-line">
+                        <span class="terminal-input-prompt">captain@compass:~$</span>
+                        <input type="text" id="terminalInput" autofocus autocomplete="off" spellcheck="false">
                         <span class="cursor"></span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Community Section -->
-    <section id="community">
+    
+    <!-- Tokenomics Section -->
+    <section id="tokenomics" class="tokenomics">
         <div class="container">
-            <h2 class="section-title">Join the Crew</h2>
-            <p class="section-subtitle">Sail with fellow compass philosophers</p>
-            <div class="social-links">
-                <a href="#" class="social-link">
-                    <span class="social-icon">🐦</span>
-                    <span>Twitter/X</span>
-                </a>
-                <a href="#" class="social-link">
-                    <span class="social-icon">💬</span>
-                    <span>Telegram</span>
-                </a>
-                <a href="#" class="social-link">
-                    <span class="social-icon">📱</span>
-                    <span>Discord</span>
-                </a>
-                <a href="#" class="social-link">
-                    <span class="social-icon">📊</span>
-                    <span>DexScreener</span>
-                </a>
+            <h2 class="section-title">Tokenomics</h2>
+            <div class="token-grid">
+                <div class="token-card">
+                    <div class="token-card-icon">🏴‍☠️</div>
+                    <h3>No Captain</h3>
+                    <p>Community-driven. No single authority. The compass points where we collectively choose.</p>
+                </div>
+                <div class="token-card">
+                    <div class="token-card-icon">🔥</div>
+                    <h3>Fair Launch</h3>
+                    <p>No pre-sale, no insider allocations. Everyone starts at the same coordinates.</p>
+                </div>
+                <div class="token-card">
+                    <div class="token-card-icon">🧭</div>
+                    <h3>Broken Compass</h3>
+                    <p>Traditional markets follow fixed paths. We embrace the chaos of choice.</p>
+                </div>
+                <div class="token-card">
+                    <div class="token-card-icon">⚓</div>
+                    <h3>Anchored in Memes</h3>
+                    <p>Not financial advice. Just a crew of pirates sailing the crypto seas.</p>
+                </div>
             </div>
         </div>
     </section>
-
+    
+    <!-- How to Buy Section -->
+    <section id="buy" class="how-to-buy">
+        <div class="container">
+            <h2 class="section-title">How To Join The Crew</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Get a Wallet</h3>
+                    <p>Install Phantom or Solflare wallet</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Get SOL</h3>
+                    <p>Buy SOL on an exchange and send to your wallet</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Swap for $COMPASS</h3>
+                    <p>Use Jupiter or Raydium to swap SOL for $COMPASS</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Set Your Course</h3>
+                    <p>Join the crew and decide your own direction</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="section-title">Ready To Break Your Compass?</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 10px;">Join Captain Jack's crew and chart your own course.</p>
+            <div class="cta-buttons">
+                <a href="#" class="cta-button">Buy $COMPASS</a>
+                <a href="#" class="cta-button secondary">Join Telegram</a>
+                <a href="#" class="cta-button secondary">Follow on X</a>
+            </div>
+        </div>
+    </section>
+    
     <!-- Footer -->
     <footer>
-        <p class="footer-text">$COMPASS - Where the needle spins and freedom begins</p>
-        <p class="footer-text">© 2025 Captain Jack Terminal. All directions reserved.</p>
-        <p class="footer-warning">
-            ⚠️ DISCLAIMER: This is a memecoin. The compass is broken. DYOR. No promises. No guarantees. 
-            Just a spinning needle and philosophical chaos. Captain Jack is not a financial advisor.
-        </p>
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="#" aria-label="Twitter">𝕏</a>
+                <a href="#" aria-label="Telegram">📱</a>
+                <a href="#" aria-label="Discord">💬</a>
+            </div>
+            <p class="footer-text">$COMPASS - Where direction is always a choice 🧭</p>
+            <p class="disclaimer">
+                DISCLAIMER: $COMPASS is a meme coin with no intrinsic value or expectation of financial return. 
+                There is no formal team or roadmap. The coin is for entertainment purposes only. 
+                This is not financial advice. DYOR.
+            </p>
+        </div>
     </footer>
-
+    
     <script>
         // === MATRIX RAIN EFFECT ===
         const canvas = document.getElementById('matrixRain');
@@ -990,24 +878,20 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$¢£¥₹₽฿⚓🧭';
+        const characters = '⚓🧭🏴‍☠️$COMPASSABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const fontSize = 14;
         const columns = canvas.width / fontSize;
-        const drops = [];
-        
-        for (let i = 0; i < columns; i++) {
-            drops[i] = Math.random() * -100;
-        }
+        const drops = Array(Math.floor(columns)).fill(1);
         
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillStyle = 'rgba(5, 8, 17, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = '#00ff41';
             ctx.font = fontSize + 'px monospace';
             
             for (let i = 0; i < drops.length; i++) {
-                const text = letters[Math.floor(Math.random() * letters.length)];
+                const text = characters[Math.floor(Math.random() * characters.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
                 
                 if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
@@ -1017,314 +901,388 @@
             }
         }
         
-        setInterval(drawMatrix, 50);
+        setInterval(drawMatrix, 35);
         
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
         
+        // === COMPASS SPIN ===
+        function spinCompass() {
+            const directions = [
+                'MOON 🚀',
+                'VALHALLA ⚔️',
+                'RUM COVE 🍾',
+                'NOWHERE 🤷',
+                'EVERYWHERE ✨',
+                'STRAIGHT TO HELL 🔥',
+                'TREASURE ISLAND 💰',
+                'THE ABYSS 🌊',
+                'BACK HOME ⚓',
+                'YOUR MOM\'S HOUSE 🏠'
+            ];
+            
+            const result = directions[Math.floor(Math.random() * directions.length)];
+            const resultDiv = document.getElementById('directionResult');
+            const needle = document.querySelector('.needle');
+            
+            // Random rotation
+            const randomDeg = Math.floor(Math.random() * 360) + 720; // At least 2 full spins
+            needle.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            needle.style.transform = `rotate(${randomDeg}deg)`;
+            
+            // Show result after spin
+            setTimeout(() => {
+                resultDiv.textContent = `The compass points to: ${result}`;
+                resultDiv.style.animation = 'none';
+                setTimeout(() => {
+                    resultDiv.style.animation = 'blink 1s infinite';
+                }, 10);
+            }, 2000);
+        }
+        
         // === TERMINAL FUNCTIONALITY ===
         const terminalBody = document.getElementById('terminalBody');
         const terminalInput = document.getElementById('terminalInput');
-        let commandHistory = [];
-        let historyIndex = 0;
         
-        // Terminal commands database
+        let visitorCount = Math.floor(Math.random() * 10000) + 1000;
+        let currentTheme = 'green';
+        let matrixMode = false;
+        let drunkMode = false;
+        let currentRiddle = null;
+        
         const commands = {
-            help: {
-                output: `Available Commands:
+            'help': `Available Commands:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  help          Show this help message
-  about         Learn about $COMPASS philosophy
-  buy           How to acquire $COMPASS
-  tokenomics    View token details
-  compass       Check compass status
-  rum           Check rum inventory
-  captain       About Captain Jack
-  savvy         Do you understand?
-  direction     Choose your direction
-  treasure      Scan for treasure
-  ls            List files
-  cat [file]    Read a file
-  clear         Clear terminal
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type any command to explore, mate. 🏴‍☠️`,
-                class: 'terminal-success'
-            },
-            about: {
-                output: `$COMPASS Philosophy
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-The compass is broken. It spins endlessly.
-North, South, East, West - it points everywhere.
+🧭 Navigation Commands:
+  spin       - Spin the broken compass
+  fortune    - Get Captain Jack's wisdom
+  riddle     - Test your pirate wit
+  visitors   - See who else has been here
+  game       - Play treasure hunt
 
-Most would call this broken.
-Captain Jack calls it enlightenment.
+🎨 Customization:
+  theme      - Change terminal color
+  matrix     - Toggle Matrix mode
+  drunk      - Toggle drunk mode (🍾)
 
-When the compass shows every direction,
-the choice becomes YOURS.
+📱 Social:
+  twitter    - Visit our X profile
+  share      - Share this terminal
 
-That's the treasure, mate.
-Not knowing where to go.
-But CHOOSING where to go.
-
-Direction is not found. Direction is CHOSEN.
+🛠️ System:
+  about      - Learn about $COMPASS
+  clear      - Clear terminal
+  help       - Show this menu
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-                class: 'terminal-success'
-            },
-            buy: {
-                output: `How to Buy $COMPASS
+            
+            'about': `About $COMPASS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Get a Solana wallet (Phantom/Solflare)
-2. Buy SOL from any exchange
-3. Visit Raydium or Jupiter DEX
-4. Connect your wallet
-5. Swap SOL for $COMPASS
-6. Let the compass spin, mate
+The compass is broken. You decide where it points.
 
-Contract: [Coming Soon]
-DEX: Raydium / Jupiter
-Chain: Solana
+$COMPASS is a meme coin on Solana that embraces the chaos 
+of crypto. No roadmap, no promises, just pure community-driven 
+direction. We don't follow traditional paths—we make our own.
 
-The needle points to opportunity... 🧭`,
-                class: 'terminal-success'
-            },
-            tokenomics: {
-                output: `$COMPASS Tokenomics
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total Supply:     1,000,000,000 $COMPASS
-Liquidity:        Burned 🔥
-Contract:         Renounced ⚓
-Tax:              0% buy / 0% sell
-Network:          Solana
+Built by pirates, for pirates. 🏴‍☠️
 
-Fair launch. No team tokens. No BS.
-Just a spinning compass and your choices.`,
-                class: 'terminal-success'
-            },
-            compass: {
-                output: `Checking compass status...
-
-[████████████████████] 100%
-
-Status: BROKEN (as designed)
-Direction: ALL OF THEM
-Certainty: 0%
-Freedom: 100%
-
-Current bearing: Spinning wildly
-Destination: YOUR CHOICE
-Future value: Whatever YOU decide it is
-
-The needle spins... 🧭`,
-                class: 'terminal-error'
-            },
-            rum: {
-                output: `Checking rum levels...
-
-[████████░░] 80% - Dangerously low!
-Status: CRITICAL
-Recommendation: Immediate refill required
-
-"Why is the rum always gone?" - Ancient proverb`,
-                class: 'terminal-warning'
-            },
-            captain: {
-                output: `Captain Jack Sparrow
-Occupation: Terminal Operator, Compass Philosopher, Rum Enthusiast
-Status: Sailing the blockchain seas
-
-"I'm not just a pirate, mate. I'm THE pirate who admitted 
- the compass was broken all along. That's what makes me dangerous."
-
-Fun fact: Lost 47 ships to rug pulls. Still sailing. 🏴‍☠️`,
-                class: 'terminal-success'
-            },
-            savvy: {
-                output: `Aye, you're gettin' it now, mate! 🏴‍☠️
-
-Savvy = Understanding
-Compass = Your choice  
-Direction = Your decision
-$COMPASS = Your treasure
-
-Clear as Caribbean waters (which is to say, not very, but we pretend).`,
-                class: 'terminal-success'
-            },
-            clear: {
-                action: 'clear'
-            },
-            ls: {
-                output: `total 3
--rw-r--r-- 1 captain crew  1337 Feb 03 broken_compass.txt
--rw-r--r-- 1 captain crew   420 Feb 03 rum_inventory.log
--rwxr-xr-x 1 captain crew  9999 Feb 03 launch_sequence.sh
-drwxr-xr-x 2 captain crew  4096 Feb 03 treasure/
--rw-r--r-- 1 captain crew   666 Feb 03 philosophy.md
-
-Hint: Try 'cat broken_compass.txt' ... or don't. I'm not your boss.`,
-                class: 'terminal-success'
-            },
-            direction: {
-                output: `Where do you want to go, mate?
-
-North? South? East? West?
-Moon? Lambo? Valhalla?
-
-The compass spins. It doesn't care.
-Neither should you.
-
-Pick a direction. ANY direction. 
-That's the whole point. 🧭
-
-Your choice: ___________`,
-                class: 'terminal-warning'
-            },
-            treasure: {
-                output: `Scanning for treasure...
-
-[████████████████████] 100%
-
-Found:
-- 0.0001 SOL (gas money)
-- 1 broken compass (priceless)  
-- ∞ philosophical insights
-- Your future $COMPASS bag (coming soon)
-
-Total value: To be determined by YOU, savvy?`,
-                class: 'terminal-success'
-            },
-            cat: {
-                output: `Usage: cat [file]
-
-Available files:
-- broken_compass.txt
-- rum_inventory.log  
-- philosophy.md
-
-Example: Try 'cat broken_compass.txt'`,
-                class: 'terminal-warning'
-            }
+This is not financial advice. This is a broken compass.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+            
+            'twitter': 'Opening X (Twitter)... 🐦',
         };
         
-        // Special multi-word commands
-        const specialCommands = {
-            'cat broken_compass.txt': `THE COMPASS IS BROKEN
-=====================
-
-By: Captain Jack Sparrow
-
-The needle spins.
-It points North, then East, then South, then West.
-Sometimes all at once.
-
-I used to think it was broken.
-Now I know: it was always this way.
-
-The compass doesn't show THE direction.
-It shows EVERY direction.
-
-The choice was always mine.
-The choice is always YOURS.
-
-EOF`,
-            'cat rum_inventory.log': `RUM INVENTORY LOG
-=================
-
-Day 1: 100 bottles
-Day 2: 73 bottles  
-Day 3: 42 bottles
-Day 4: 15 bottles
-Day 5: 3 bottles
-Day 6: WHERE DID IT GO?
-Day 7: Found 1 bottle (empty)
-
-Current status: EMERGENCY
-Action required: URGENT RESUPPLY
-
-"But why is the rum gone?" - Me, daily`,
-            'cat philosophy.md': `# The Compass Philosophy
-
-## Core Principle
-Direction is not found. Direction is chosen.
-
-## The Broken Compass
-- Spins endlessly  
-- Points everywhere
-- Decides nothing
-
-## The Captain  
-- Watches the spin
-- Chooses anyway
-- Sails regardless
-
-## The Lesson
-Uncertainty is not a bug.
-Uncertainty is freedom.
-
-Savvy? 🏴‍☠️`
-        };
+        const fortunes = [
+            "A broken compass leads to the best adventures.",
+            "The treasure was the memes we made along the way.",
+            "Today's direction: wherever the wind doesn't blow.",
+            "Fortune favors the hodlers... sometimes.",
+            "The stars say: DYOR, mate.",
+            "Your future is as uncertain as this compass.",
+            "A wise pirate once said: 'I have no idea what I'm doing.'",
+            "The charts point to... chaos. As usual.",
+            "When in doubt, spin the compass again.",
+            "Not all who wander are lost. Some just have broken compasses."
+        ];
+        
+        const riddles = [
+            {
+                question: "I have cities but no houses, forests but no trees, and water but no fish. What am I?",
+                answer: "map",
+                hint: "Pirates use this to find treasure..."
+            },
+            {
+                question: "What has a head, a tail, but no body?",
+                answer: "coin",
+                hint: "You're probably holding some right now..."
+            },
+            {
+                question: "The more you take, the more you leave behind. What am I?",
+                answer: "footsteps",
+                hint: "Think about walking on a beach..."
+            }
+        ];
         
         terminalInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                const command = this.value.trim().toLowerCase();
-                commandHistory.push(this.value);
-                historyIndex = commandHistory.length;
+                const input = this.value.trim().toLowerCase();
                 
-                // Add command to terminal
-                addTerminalLine(`captain@terminal:~$ ${this.value}`, 'terminal-prompt');
-                
-                // Process command
-                processCommand(command);
-                
-                this.value = '';
-                scrollToBottom();
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (historyIndex > 0) {
-                    historyIndex--;
-                    this.value = commandHistory[historyIndex];
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (historyIndex < commandHistory.length - 1) {
-                    historyIndex++;
-                    this.value = commandHistory[historyIndex];
-                } else {
-                    historyIndex = commandHistory.length;
+                if (input) {
+                    // Echo the command
+                    addTerminalLine(`captain@compass:~$ ${this.value}`, 'terminal-prompt');
+                    
+                    // Process command
+                    processCommand(input);
+                    
+                    // Clear input
                     this.value = '';
                 }
+                
+                scrollToBottom();
             }
         });
         
         function processCommand(cmd) {
-            // Check special multi-word commands first
-            if (specialCommands[cmd]) {
-                addTerminalLine(specialCommands[cmd], 'terminal-success');
+            // Handle riddle answers
+            if (currentRiddle !== null) {
+                if (cmd === 'hint') {
+                    addTerminalLine(`💡 HINT: ${currentRiddle.hint}`, 'terminal-warning');
+                    return;
+                } else if (cmd === 'skip') {
+                    addTerminalLine(`The answer was: ${currentRiddle.answer.toUpperCase()}
+Better luck next time, landlubber! 🏴‍☠️`, 'terminal-error');
+                    currentRiddle = null;
+                    return;
+                } else if (cmd === currentRiddle.answer) {
+                    addTerminalLine(`🎉 CORRECT! 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You've proven your wit, Captain! 
+Type 'riddle' for another challenge.`, 'terminal-success');
+                    currentRiddle = null;
+                    return;
+                } else {
+                    addTerminalLine(`❌ Wrong answer! Try again, or type 'hint' or 'skip'.`, 'terminal-error');
+                    return;
+                }
+            }
+            
+            // Regular commands
+            if (commands[cmd]) {
+                const response = drunkMode ? drunkify(commands[cmd]) : commands[cmd];
+                addTerminalLine(response, cmd === 'help' ? 'terminal-success' : 'terminal-text');
+                
+                if (cmd === 'twitter') {
+                    window.open('https://x.com/scwengzer', '_blank');
+                }
+            } else if (cmd === 'spin') {
+                handleSpin();
+            } else if (cmd === 'fortune') {
+                handleFortune();
+            } else if (cmd === 'riddle') {
+                handleRiddle();
+            } else if (cmd === 'visitors') {
+                handleVisitors();
+            } else if (cmd === 'share') {
+                handleShare();
+            } else if (cmd === 'theme') {
+                handleTheme();
+            } else if (cmd === 'matrix') {
+                handleMatrix();
+            } else if (cmd === 'drunk') {
+                handleDrunk();
+            } else if (cmd === 'game') {
+                handleGame();
+            } else if (cmd === 'clear' || cmd === 'cls') {
+                clearTerminal();
+            } else {
+                const errorMsg = `Command not found: ${cmd}
+Type 'help' for available commands.`;
+                addTerminalLine(drunkMode ? drunkify(errorMsg) : errorMsg, 'terminal-error');
+            }
+        }
+        
+        function handleSpin() {
+            const directions = ['MOON', 'VALHALLA', 'RUM COVE', 'NOWHERE', 'EVERYWHERE'];
+            const chosen = directions[Math.floor(Math.random() * directions.length)];
+            
+            addTerminalLine(`🧭 SPINNING THE COMPASS...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[████████████] 100%
+
+The needle spins wildly and points to: ${chosen}!
+
+${chosen === 'MOON' ? '🚀 To the moon it is!' : 
+  chosen === 'VALHALLA' ? '⚔️ A warrior\'s choice!' :
+  chosen === 'RUM COVE' ? '🍾 A wise decision!' :
+  chosen === 'NOWHERE' ? '🤷 As good as any direction!' :
+  chosen === 'EVERYWHERE' ? '✨ All directions at once!' :
+  '⚓ A fine heading, Captain!'}
+
+Remember: The compass decided nothing. YOU chose to spin it.`, 'terminal-success');
+        }
+        
+        function handleFortune() {
+            const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+            addTerminalLine(`🔮 CAPTAIN JACK'S FORTUNE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${fortune}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type 'fortune' again for more wisdom!`, 'terminal-success');
+        }
+        
+        function handleRiddle() {
+            if (currentRiddle !== null) {
+                addTerminalLine(`You already have an active riddle! Answer it first, or type 'skip'.`, 'terminal-warning');
                 return;
             }
             
-            // Check regular commands
-            if (commands[cmd]) {
-                if (commands[cmd].action === 'clear') {
-                    clearTerminal();
-                } else {
-                    addTerminalLine(commands[cmd].output, commands[cmd].class);
-                }
-            } else if (cmd === '') {
-                // Empty command, do nothing
-            } else {
-                // Unknown command
-                const responses = [
-                    `bash: ${cmd}: command not found. Try 'help', mate.`,
-                    `${cmd}? Never heard of it. I suggest 'help'.`,
-                    `That's not a command, savvy? Type 'help'.`,
-                    `[ERROR] Unknown command: ${cmd}. Lost at sea? Try 'help'.`,
-                    `Compass says: "${cmd}" leads nowhere. Try 'help' instead.`
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                addTerminalLine(randomResponse, 'terminal-error');
-            }
+            currentRiddle = riddles[Math.floor(Math.random() * riddles.length)];
+            addTerminalLine(`🤔 RIDDLE TIME!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${currentRiddle.question}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type your answer, or type 'hint' for a clue, or 'skip' to give up.`, 'terminal-warning');
+        }
+        
+        function handleVisitors() {
+            addTerminalLine(`👥 TERMINAL STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total visitors who've used this terminal: ${visitorCount}
+
+You're one of ${visitorCount} brave souls who explored Captain Jack's terminal.
+
+The compass spins for all of you. 🧭
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'terminal-success');
+        }
+        
+        function handleShare() {
+            const text = encodeURIComponent("I just explored Captain Jack's terminal on $COMPASS\n\nThe compass is broken. Direction is a choice. 🧭🏴‍☠️\n\nTry it yourself:");
+            const url = encodeURIComponent(window.location.href);
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}&hashtags=COMPASS,Solana`;
+            
+            addTerminalLine(`📱 SHARE ON TWITTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Opening Twitter share dialog...
+
+Share this terminal with your crew! 🏴‍☠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'terminal-success');
+            
+            window.open(twitterUrl, '_blank');
+        }
+        
+        function handleTheme() {
+            const themes = ['green', 'gold', 'red', 'blue'];
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            currentTheme = themes[nextIndex];
+            
+            const colors = {
+                green: '#00ff41',
+                gold: '#d4af37',
+                red: '#ff3366',
+                blue: '#00d4ff'
+            };
+            
+            document.querySelectorAll('.terminal-success, .terminal-text, .terminal-input-prompt, #terminalInput, .cursor').forEach(el => {
+                el.style.color = colors[currentTheme];
+            });
+            
+            addTerminalLine(`🎨 Theme changed to: ${currentTheme.toUpperCase()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type 'theme' again to cycle through themes.
+Available: green → gold → red → blue`, 'terminal-success');
+        }
+        
+        function handleMatrix() {
+            matrixMode = !matrixMode;
+            const canvas = document.getElementById('matrixRain');
+            canvas.style.opacity = matrixMode ? '0.4' : '0.15';
+            
+            addTerminalLine(matrixMode ? 
+                `🟢 MATRIX MODE ACTIVATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Wake up, Neo... the compass has you.
+Follow the white rabbit. 🐰
+
+Type 'matrix' again to return to normal.` :
+                `⚫ MATRIX MODE DEACTIVATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Back to the regular broken compass.
+Reality is overrated anyway. 🧭`, 'terminal-success');
+        }
+        
+        function handleDrunk() {
+            drunkMode = !drunkMode;
+            addTerminalLine(drunkMode ?
+                drunkify(`🍾 DRUNK MODE ACTIVATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*hic* Why ish the rum... alwaysh gone? *hic*
+All reshhponshesh will now be... *hic* ...slurred!
+
+Type 'drunk' again to shober up... I mean sober. Whatever.`) :
+                `💧 DRUNK MODE DEACTIVATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Back to regular speech, mate.
+(Though Captain Jack is never truly sober)`, drunkMode ? 'terminal-warning' : 'terminal-success');
+        }
+        
+        function handleGame() {
+            const directions = ['NORTH', 'SOUTH', 'EAST', 'WEST'];
+            const treasures = [
+                ['💰 5 gold doubloons', '🗺️ An old treasure map', '⚓ A rusty anchor'],
+                ['🍾 2 bottles of rum', '📜 A mysterious scroll', '🔱 A trident (broken)'],
+                ['💎 3 precious gems', '🏴‍☠️ A pirate flag', '🦜 A talking parrot'],
+                ['🔑 A golden key', '📿 Pearl necklace', '🌴 A coconut (why?)'],
+                ['👑 A crown (probably fake)', '🎭 An old mask', '🧭 Another broken compass']
+            ];
+            
+            const direction = directions[Math.floor(Math.random() * directions.length)];
+            const treasure = treasures[Math.floor(Math.random() * treasures.length)];
+            const note = [
+                "The real treasure was the memes we made along the way",
+                "X marks the spot... but the compass is broken, so who knows?",
+                "Not all treasure is silver and gold, mate",
+                "This treasure is worthless. Just like financial advice.",
+                "You found it! Or did it find you? The compass knows."
+            ];
+            
+            const randomNote = note[Math.floor(Math.random() * note.length)];
+            
+            addTerminalLine(`🏴‍☠️ TREASURE HUNT GAME 🏴‍☠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You're searching for Captain Jack's treasure!
+
+Spinning the compass...
+[████████████████████] Scanning...
+
+The compass points to: ${direction}!
+
+You dig in the ${direction.toLowerCase()}ern shore and find:
+${treasure.map(t => '  ' + t).join('\n')}
+📜 A note: "${randomNote}"
+
+Total value: PRICELESS (and worthless)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Type 'game' again for another treasure hunt!`, 'terminal-success');
+        }
+        
+        function drunkify(text) {
+            return text
+                .replace(/s/g, 'sh')
+                .replace(/S/g, 'Sh')
+                .replace(/you/g, 'ya')
+                .replace(/You/g, 'Ya')
+                .replace(/the/g, 'thee')
+                .replace(/The/g, 'Thee')
+                .split(' ')
+                .map(word => Math.random() > 0.9 ? word + ' *hic*' : word)
+                .join(' ');
         }
         
         function addTerminalLine(text, className = 'terminal-text') {
