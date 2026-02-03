@@ -1,0 +1,21 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle - Gold -->
+  <circle cx="32" cy="32" r="30" fill="#0a0e27" stroke="#d4af37" stroke-width="3"/>
+  
+  <!-- Inner circle - Terminal green glow -->
+  <circle cx="32" cy="32" r="24" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.3"/>
+  
+  <!-- Compass directions -->
+  <text x="32" y="12" text-anchor="middle" fill="#00ff41" font-family="Arial" font-size="8" font-weight="bold">N</text>
+  <text x="52" y="35" text-anchor="middle" fill="#00ff41" font-family="Arial" font-size="8" font-weight="bold">E</text>
+  <text x="32" y="56" text-anchor="middle" fill="#00ff41" font-family="Arial" font-size="8" font-weight="bold">S</text>
+  <text x="12" y="35" text-anchor="middle" fill="#00ff41" font-family="Arial" font-size="8" font-weight="bold">W</text>
+  
+  <!-- Compass needle - Red top, Green bottom -->
+  <polygon points="32,12 30,32 34,32" fill="#ff3366"/>
+  <polygon points="32,52 30,32 34,32" fill="#00ff41"/>
+  
+  <!-- Center dot - Gold -->
+  <circle cx="32" cy="32" r="4" fill="#d4af37"/>
+  <circle cx="32" cy="32" r="2.5" fill="#0a0e27"/>
+</svg>
