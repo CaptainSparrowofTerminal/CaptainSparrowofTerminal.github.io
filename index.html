@@ -187,6 +187,21 @@
             color: var(--primary-gold);
             text-shadow: 0 0 20px var(--terminal-green);
             letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            filter: drop-shadow(0 0 10px var(--terminal-green));
+            animation: rotate 8s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         .nav-links {
@@ -618,6 +633,140 @@
             margin-top: 40px;
         }
         
+        /* Interactive Terminal */
+        #terminal-access {
+            padding: 80px 20px;
+        }
+        
+        .terminal-window {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #000;
+            border: 2px solid var(--terminal-green);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 65, 0.3),
+                0 0 60px rgba(0, 255, 65, 0.1);
+        }
+        
+        .terminal-header {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--terminal-green);
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+        }
+        
+        .terminal-button.close {
+            background: #ff3366;
+        }
+        
+        .terminal-button.minimize {
+            background: #d4af37;
+        }
+        
+        .terminal-button.maximize {
+            background: #00ff41;
+        }
+        
+        .terminal-title {
+            color: var(--terminal-green);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: var(--terminal-green);
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .terminal-line {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .terminal-prompt {
+            color: var(--primary-gold);
+            white-space: nowrap;
+        }
+        
+        .terminal-text {
+            color: var(--terminal-green);
+        }
+        
+        .terminal-error {
+            color: #ff3366;
+        }
+        
+        .terminal-success {
+            color: var(--terminal-green);
+        }
+        
+        .terminal-warning {
+            color: var(--primary-gold);
+        }
+        
+        .terminal-input-line {
+            align-items: center;
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--terminal-green);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            flex: 1;
+            caret-color: transparent;
+        }
+        
+        .terminal-cursor {
+            color: var(--terminal-green);
+            animation: blink-cursor 1s step-end infinite;
+        }
+        
+        @keyframes blink-cursor {
+            50% { opacity: 0; }
+        }
+        
+        /* Custom scrollbar for terminal */
+        .terminal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--terminal-green);
+            border-radius: 4px;
+        }
+        
         .social-link {
             display: flex;
             align-items: center;
@@ -774,7 +923,10 @@
     <header>
         <div class="container">
             <div class="nav-container">
-                <div class="logo">⚓ CAPTAIN JACK TERMINAL</div>
+                <div class="logo">
+                    <img src="favicon.svg" alt="Compass" class="logo-icon">
+                    CAPTAIN JACK TERMINAL
+                </div>
                 <ul class="nav-links">
                     <li><a href="#about">ABOUT</a></li>
                     <li><a href="#tokenomics">TOKENOMICS</a></li>
@@ -923,6 +1075,38 @@
         </div>
     </section>
     
+    <!-- Interactive Terminal Section -->
+    <section id="terminal-access">
+        <div class="container">
+            <h2 class="section-title" data-text="Terminal Access">Terminal Access</h2>
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="terminal-button close"></span>
+                        <span class="terminal-button minimize"></span>
+                        <span class="terminal-button maximize"></span>
+                    </div>
+                    <div class="terminal-title">captain@terminal:~</div>
+                </div>
+                <div class="terminal-body" id="terminalBody">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">captain@terminal:~$</span>
+                        <span class="terminal-text">Welcome to Captain Jack Terminal v1.0</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">captain@terminal:~$</span>
+                        <span class="terminal-text">Type 'help' for available commands. Savvy?</span>
+                    </div>
+                    <div class="terminal-line terminal-input-line">
+                        <span class="terminal-prompt">captain@terminal:~$</span>
+                        <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false" autofocus>
+                        <span class="terminal-cursor">█</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <!-- Social Links Section -->
     <section id="social">
         <div class="container">
@@ -1061,6 +1245,302 @@
         console.log('%cThe compass is broken. You decide where it points.', 'color: #00ff41; font-size: 14px;');
         console.log('%cDirection is a choice, savvy? 🏴‍☠️', 'color: #d4af37; font-size: 12px;');
         console.log('%c', 'font-size: 1px; padding: 50px 100px; background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4=);');
+        
+        // === INTERACTIVE TERMINAL ===
+        const terminalInput = document.getElementById('terminalInput');
+        const terminalBody = document.getElementById('terminalBody');
+        let commandHistory = [];
+        let historyIndex = -1;
+        
+        const commands = {
+            help: {
+                output: `Available commands:
+  help      - Show this help message
+  launch    - Launch information
+  compass   - About the compass philosophy  
+  price     - Check $COMPASS price
+  rum       - Check rum levels (critical)
+  captain   - About Captain Jack
+  savvy     - Do you understand?
+  clear     - Clear terminal
+  ls        - List files
+  direction - Choose your direction
+  treasure  - Hunt for treasure`,
+                class: 'terminal-success'
+            },
+            launch: {
+                output: `$COMPASS Launch Status: COMING SOON
+                
+Preparations:
+[████████████████████] 100% - Website deployed
+[████████████████████] 100% - Philosophy established  
+[████░░░░░░░░░░░░░░░░]  20% - Community building
+[░░░░░░░░░░░░░░░░░░░░]   0% - Token launch
+
+The compass spins. Patience, mate.`,
+                class: 'terminal-warning'
+            },
+            compass: {
+                output: `The Compass Philosophy:
+
+"The compass is broken. You decide where it points."
+
+For years, I followed charts, experts, predictions.
+Then I realized: they're all just broken compasses too.
+
+Direction isn't FOUND. Direction is CHOSEN.
+
+That's $COMPASS. That's freedom. Savvy?`,
+                class: 'terminal-success'
+            },
+            price: {
+                output: `[ERROR] Price data not available
+         Reason: Token not yet launched
+         
+Current value: IMMEASURABLE (it's a philosophy, mate)
+Future value: Whatever YOU decide it is
+
+The needle spins... 🧭`,
+                class: 'terminal-error'
+            },
+            rum: {
+                output: `Checking rum levels...
+
+[████████░░] 80% - Dangerously low!
+Status: CRITICAL
+Recommendation: Immediate refill required
+
+"Why is the rum always gone?" - Ancient proverb`,
+                class: 'terminal-warning'
+            },
+            captain: {
+                output: `Captain Jack Sparrow
+Occupation: Terminal Operator, Compass Philosopher, Rum Enthusiast
+Status: Sailing the blockchain seas
+
+"I'm not just a pirate, mate. I'm THE pirate who admitted 
+ the compass was broken all along. That's what makes me dangerous."
+
+Fun fact: Lost 47 ships to rug pulls. Still sailing. 🏴‍☠️`,
+                class: 'terminal-success'
+            },
+            savvy: {
+                output: `Aye, you're gettin' it now, mate! 🏴‍☠️
+
+Savvy = Understanding
+Compass = Your choice  
+Direction = Your decision
+$COMPASS = Your treasure
+
+Clear as Caribbean waters (which is to say, not very, but we pretend).`,
+                class: 'terminal-success'
+            },
+            clear: {
+                action: 'clear'
+            },
+            ls: {
+                output: `total 3
+-rw-r--r-- 1 captain crew  1337 Feb 03 broken_compass.txt
+-rw-r--r-- 1 captain crew   420 Feb 03 rum_inventory.log
+-rwxr-xr-x 1 captain crew  9999 Feb 03 launch_sequence.sh
+drwxr-xr-x 2 captain crew  4096 Feb 03 treasure/
+-rw-r--r-- 1 captain crew   666 Feb 03 philosophy.md
+
+Hint: Try 'cat broken_compass.txt' ... or don't. I'm not your boss.`,
+                class: 'terminal-success'
+            },
+            direction: {
+                output: `Where do you want to go, mate?
+
+North? South? East? West?
+Moon? Lambo? Valhalla?
+
+The compass spins. It doesn't care.
+Neither should you.
+
+Pick a direction. ANY direction. 
+That's the whole point. 🧭
+
+Your choice: ___________`,
+                class: 'terminal-warning'
+            },
+            treasure: {
+                output: `Scanning for treasure...
+
+[████████████████████] 100%
+
+Found:
+- 0.0001 SOL (gas money)
+- 1 broken compass (priceless)  
+- ∞ philosophical insights
+- Your future $COMPASS bag (coming soon)
+
+Total value: To be determined by YOU, savvy?`,
+                class: 'terminal-success'
+            },
+            cat: {
+                output: `Usage: cat [file]
+
+Available files:
+- broken_compass.txt
+- rum_inventory.log  
+- philosophy.md
+
+Example: Try 'cat broken_compass.txt'`,
+                class: 'terminal-warning'
+            }
+        };
+        
+        // Special multi-word commands
+        const specialCommands = {
+            'cat broken_compass.txt': `THE COMPASS IS BROKEN
+=====================
+
+By: Captain Jack Sparrow
+
+The needle spins.
+It points North, then East, then South, then West.
+Sometimes all at once.
+
+I used to think it was broken.
+Now I know: it was always this way.
+
+The compass doesn't show THE direction.
+It shows EVERY direction.
+
+The choice was always mine.
+The choice is always YOURS.
+
+EOF`,
+            'cat rum_inventory.log': `RUM INVENTORY LOG
+=================
+
+Day 1: 100 bottles
+Day 2: 73 bottles  
+Day 3: 42 bottles
+Day 4: 15 bottles
+Day 5: 3 bottles
+Day 6: WHERE DID IT GO?
+Day 7: Found 1 bottle (empty)
+
+Current status: EMERGENCY
+Action required: URGENT RESUPPLY
+
+"But why is the rum gone?" - Me, daily`,
+            'cat philosophy.md': `# The Compass Philosophy
+
+## Core Principle
+Direction is not found. Direction is chosen.
+
+## The Broken Compass
+- Spins endlessly  
+- Points everywhere
+- Decides nothing
+
+## The Captain  
+- Watches the spin
+- Chooses anyway
+- Sails regardless
+
+## The Lesson
+Uncertainty is not a bug.
+Uncertainty is freedom.
+
+Savvy? 🏴‍☠️`
+        };
+        
+        terminalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = this.value.trim().toLowerCase();
+                commandHistory.push(this.value);
+                historyIndex = commandHistory.length;
+                
+                // Add command to terminal
+                addTerminalLine(`captain@terminal:~$ ${this.value}`, 'terminal-prompt');
+                
+                // Process command
+                processCommand(command);
+                
+                this.value = '';
+                scrollToBottom();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    this.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    this.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    this.value = '';
+                }
+            }
+        });
+        
+        function processCommand(cmd) {
+            // Check special multi-word commands first
+            if (specialCommands[cmd]) {
+                addTerminalLine(specialCommands[cmd], 'terminal-success');
+                return;
+            }
+            
+            // Check regular commands
+            if (commands[cmd]) {
+                if (commands[cmd].action === 'clear') {
+                    clearTerminal();
+                } else {
+                    addTerminalLine(commands[cmd].output, commands[cmd].class);
+                }
+            } else if (cmd === '') {
+                // Empty command, do nothing
+            } else {
+                // Unknown command
+                const responses = [
+                    `bash: ${cmd}: command not found. Try 'help', mate.`,
+                    `${cmd}? Never heard of it. I suggest 'help'.`,
+                    `That's not a command, savvy? Type 'help'.`,
+                    `[ERROR] Unknown command: ${cmd}. Lost at sea? Try 'help'.`,
+                    `Compass says: "${cmd}" leads nowhere. Try 'help' instead.`
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addTerminalLine(randomResponse, 'terminal-error');
+            }
+        }
+        
+        function addTerminalLine(text, className = 'terminal-text') {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            
+            const textSpan = document.createElement('span');
+            textSpan.className = className;
+            textSpan.style.whiteSpace = 'pre-wrap';
+            textSpan.textContent = text;
+            
+            line.appendChild(textSpan);
+            
+            const inputLine = terminalBody.querySelector('.terminal-input-line');
+            terminalBody.insertBefore(line, inputLine);
+        }
+        
+        function clearTerminal() {
+            const lines = terminalBody.querySelectorAll('.terminal-line:not(.terminal-input-line)');
+            lines.forEach(line => line.remove());
+            
+            addTerminalLine('Terminal cleared. Type "help" for commands.', 'terminal-success');
+        }
+        
+        function scrollToBottom() {
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+        
+        // Click on terminal to focus input
+        terminalBody.addEventListener('click', function() {
+            terminalInput.focus();
+        });
         
         // === TYPING EFFECT FOR SECTIONS (on scroll) ===
         const observerOptions = {
