@@ -6,6 +6,10 @@
     <title>$COMPASS - Direction Is A Choice | Captain Jack Terminal</title>
     <meta name="description" content="The compass is broken. You decide where it points. Official terminal for $COMPASS coin.">
     
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <!-- Inline SVG Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230a0e27' stroke='%23d4af37' stroke-width='3'/%3E%3Cpath d='M50 20 L55 45 L50 50 L45 45 Z' fill='%2300ff41'/%3E%3Cpath d='M50 80 L45 55 L50 50 L55 55 Z' fill='%23ff3366'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23d4af37'/%3E%3C/svg%3E">
     
@@ -951,6 +955,30 @@
         let matrixMode = false;
         let drunkMode = false;
         let currentRiddle = null;
+        let chatMode = false;
+        let userNickname = null;
+        let database = null;
+        let messagesRef = null;
+        
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDdmoH4X4TeRRQjfFbM-HUuvdoxLinDI",
+            authDomain: "compass-chat-d8034.firebaseapp.com",
+            databaseURL: "https://compass-chat-d8034-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "compass-chat-d8034",
+            storageBucket: "compass-chat-d8034.firebasestorage.app",
+            messagingSenderId: "669678028818",
+            appId: "1:669678028818:web:3245ba2bb6d8c225fd30cb"
+        };
+        
+        // Initialize Firebase (wrap in try-catch for safety)
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            messagesRef = database.ref('messages');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
         
         const commands = {
             'help': `Available Commands:
@@ -970,6 +998,7 @@
 📱 Social:
   twitter    - Visit our X profile
   share      - Share this terminal
+  chat       - Join anonymous crew chat
 
 🛠️ System:
   about      - Learn about $COMPASS
@@ -1044,6 +1073,19 @@ This is not financial advice. This is a broken compass.
         });
         
         function processCommand(cmd) {
+            // Handle chat mode
+            if (chatMode) {
+                if (cmd === 'exit' || cmd === 'quit') {
+                    chatMode = false;
+                    stopRealtimeListener();
+                    addTerminalLine(`👋 You left the crew chat. Type 'chat' to rejoin.`, 'terminal-warning');
+                    return;
+                } else {
+                    sendChatMessage(cmd);
+                    return;
+                }
+            }
+            
             // Handle riddle answers
             if (currentRiddle !== null) {
                 if (cmd === 'hint') {
@@ -1093,6 +1135,8 @@ Type 'riddle' for another challenge.`, 'terminal-success');
                 handleDrunk();
             } else if (cmd === 'game') {
                 handleGame();
+            } else if (cmd === 'chat') {
+                handleChat();
             } else if (cmd === 'clear' || cmd === 'cls') {
                 clearTerminal();
             } else {
@@ -1270,6 +1314,118 @@ Total value: PRICELESS (and worthless)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Type 'game' again for another treasure hunt!`, 'terminal-success');
+        }
+        
+        function handleChat() {
+            if (!database) {
+                addTerminalLine(`❌ Chat system is offline. Firebase not initialized.`, 'terminal-error');
+                return;
+            }
+            
+            if (!userNickname) {
+                const pirates = ['BlackBeard', 'RedRum', 'SeaWolf', 'IronHook', 'StormSail', 'GoldTooth', 
+                               'MadDog', 'SilverShark', 'DarkWave', 'FireCannon', 'GhostShip', 'ThunderBolt',
+                               'RogueWind', 'ScarFace', 'BloodyMary', 'DeadEye', 'WildSea', 'LostSoul'];
+                userNickname = pirates[Math.floor(Math.random() * pirates.length)] + Math.floor(Math.random() * 999);
+            }
+            
+            chatMode = true;
+            addTerminalLine(`💬 CREW CHAT - ANONYMOUS MODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Welcome to the crew chat, ${userNickname}! 🏴‍☠️
+
+Your messages are anonymous and visible to all crew members worldwide.
+Type your message and press Enter to send.
+Type 'exit' or 'quit' to leave the chat.
+
+🔥 Real-time Firebase chat - messages sync instantly!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'terminal-success');
+            
+            // Load recent messages
+            loadRecentMessages();
+            
+            // Listen for new messages in real-time
+            setupRealtimeListener();
+        }
+        
+        function sendChatMessage(message) {
+            if (!message.trim() || !database) return;
+            
+            const chatData = {
+                nickname: userNickname,
+                message: message.substring(0, 500), // Limit message length
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            // Push to Firebase
+            messagesRef.push(chatData)
+                .then(() => {
+                    // Message sent successfully
+                })
+                .catch((error) => {
+                    addTerminalLine(`❌ Failed to send message: ${error.message}`, 'terminal-error');
+                });
+        }
+        
+        function loadRecentMessages() {
+            if (!database) return;
+            
+            // Load last 20 messages
+            messagesRef.orderByChild('timestamp').limitToLast(20).once('value')
+                .then((snapshot) => {
+                    const messages = [];
+                    snapshot.forEach((childSnapshot) => {
+                        messages.push(childSnapshot.val());
+                    });
+                    
+                    // Display messages
+                    messages.forEach(msg => {
+                        displayChatMessage(msg);
+                    });
+                })
+                .catch((error) => {
+                    addTerminalLine(`❌ Failed to load messages: ${error.message}`, 'terminal-error');
+                });
+        }
+        
+        function setupRealtimeListener() {
+            if (!database || window.chatListener) return;
+            
+            // Listen for new messages added after current time
+            const startTime = Date.now();
+            
+            window.chatListener = messagesRef.orderByChild('timestamp')
+                .startAt(startTime)
+                .on('child_added', (snapshot) => {
+                    const msg = snapshot.val();
+                    // Only show messages from others, not our own (Firebase handles echo)
+                    if (msg.timestamp >= startTime && msg.nickname !== userNickname) {
+                        displayChatMessage(msg);
+                    }
+                });
+        }
+        
+        function displayChatMessage(msg) {
+            if (!msg || !chatMode) return;
+            
+            const time = msg.timestamp ? 
+                new Date(msg.timestamp).toLocaleTimeString('tr-TR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }) : 
+                new Date().toLocaleTimeString('tr-TR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            
+            addTerminalLine(`[${time}] ${msg.nickname}: ${msg.message}`, 'terminal-text');
+        }
+        
+        function stopRealtimeListener() {
+            if (window.chatListener && messagesRef) {
+                messagesRef.off('child_added', window.chatListener);
+                window.chatListener = null;
+            }
         }
         
         function drunkify(text) {
