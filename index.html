@@ -6,6 +6,9 @@
     <title>$COMPASS - Direction Is A Choice | Captain Jack Terminal</title>
     <meta name="description" content="The compass is broken. You decide where it points. Official terminal for $COMPASS coin.">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Pirata+One&display=swap');
         
@@ -69,6 +72,87 @@
         @keyframes scan {
             0% { transform: translateY(0); }
             100% { transform: translateY(10px); }
+        }
+        
+        /* Boot Sequence Overlay */
+        .boot-sequence {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeOut 0.5s ease 3.5s forwards;
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+        
+        .boot-content {
+            font-family: 'Courier New', monospace;
+            color: var(--terminal-green);
+            max-width: 600px;
+            padding: 40px;
+        }
+        
+        .boot-logo {
+            font-family: 'Pirata One', cursive;
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px var(--terminal-green);
+        }
+        
+        .boot-line {
+            margin: 15px 0;
+            opacity: 0;
+            animation: bootLineAppear 0.3s ease forwards;
+        }
+        
+        .boot-line:nth-child(1) { animation-delay: 0.2s; }
+        .boot-line:nth-child(2) { animation-delay: 0.6s; }
+        .boot-line:nth-child(3) { animation-delay: 1s; }
+        .boot-line:nth-child(4) { animation-delay: 1.4s; }
+        .boot-line:nth-child(5) { animation-delay: 2s; }
+        
+        @keyframes bootLineAppear {
+            to { opacity: 1; }
+        }
+        
+        .boot-ok {
+            color: var(--terminal-green);
+            font-weight: bold;
+        }
+        
+        .boot-final {
+            margin-top: 30px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        /* Matrix Rain Canvas */
+        #matrixRain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
         }
         
         /* Container */
@@ -265,11 +349,29 @@
             max-width: 600px;
             text-align: left;
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            position: relative;
         }
         
         .terminal-text::before {
             content: '> ';
             color: var(--terminal-green);
+        }
+        
+        .terminal-text .typing {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--terminal-green);
+            animation: typing 2s steps(50) 1s forwards, blink-caret 0.75s step-end infinite;
+            max-width: 0;
+        }
+        
+        @keyframes typing {
+            to { max-width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            50% { border-color: transparent; }
         }
         
         .cta-buttons {
@@ -342,6 +444,25 @@
         }
         
         /* About Section */
+        #about {
+            position: relative;
+        }
+        
+        #about::before {
+            content: '';
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 250px;
+            height: 350px;
+            background: url('sparrow.svg') no-repeat center;
+            background-size: contain;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
         .about-content {
             max-width: 800px;
             margin: 0 auto;
@@ -350,6 +471,8 @@
             border: 2px solid var(--terminal-green);
             border-radius: 10px;
             box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            position: relative;
+            z-index: 1;
         }
         
         .about-content p {
@@ -583,10 +706,69 @@
         .glitch {
             animation: glitch 0.3s infinite;
         }
+        
+        .glitch-hover:hover {
+            animation: glitch 0.3s ease;
+        }
+        
+        /* Enhanced glitch for section titles */
+        .section-title {
+            position: relative;
+        }
+        
+        .section-title::before,
+        .section-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+        
+        .section-title:hover::before {
+            animation: glitch-1 0.3s ease;
+            color: var(--terminal-green);
+            z-index: -1;
+        }
+        
+        .section-title:hover::after {
+            animation: glitch-2 0.3s ease;
+            color: var(--accent-red);
+            z-index: -2;
+        }
+        
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); opacity: 0; }
+            20%, 80% { transform: translate(-3px, 3px); opacity: 0.8; }
+        }
+        
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); opacity: 0; }
+            20%, 80% { transform: translate(3px, -3px); opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
     <div class="scanlines"></div>
+    
+    <!-- Boot Sequence Overlay -->
+    <div class="boot-sequence" id="bootSequence">
+        <div class="boot-content">
+            <div class="boot-logo">⚓ CAPTAIN JACK TERMINAL ⚓</div>
+            <div class="boot-text">
+                <div class="boot-line">[<span class="boot-ok">OK</span>] Loading compass module...</div>
+                <div class="boot-line">[<span class="boot-ok">OK</span>] Initializing blockchain connection...</div>
+                <div class="boot-line">[<span class="boot-ok">OK</span>] Calibrating broken compass...</div>
+                <div class="boot-line">[<span class="boot-ok">OK</span>] Direction module: <span style="color: #d4af37;">CHOICE MODE</span></div>
+                <div class="boot-line boot-final">> Captain Jack Terminal ready. Press any key...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrixRain"></canvas>
     
     <!-- Header -->
     <header>
@@ -622,7 +804,7 @@
         <h2>Direction Is A Choice</h2>
         
         <div class="terminal-text">
-            The compass is broken. You decide where it points.
+            <span class="typing">The compass is broken. You decide where it points.</span>
         </div>
         
         <div class="cta-buttons">
@@ -634,7 +816,7 @@
     <!-- About Section -->
     <section id="about">
         <div class="container">
-            <h2 class="section-title">The Philosophy</h2>
+            <h2 class="section-title" data-text="The Philosophy">The Philosophy</h2>
             <div class="about-content">
                 <p>
                     For years, I sailed by me compass, mate. Trusted it. Followed it blindly. Let it decide me fate.
@@ -683,7 +865,7 @@
     <!-- Tokenomics Section -->
     <section id="tokenomics">
         <div class="container">
-            <h2 class="section-title">Tokenomics</h2>
+            <h2 class="section-title" data-text="Tokenomics">Tokenomics</h2>
             <div class="tokenomics-grid">
                 <div class="token-card">
                     <h3>TOTAL SUPPLY</h3>
@@ -712,7 +894,7 @@
     <!-- How to Buy Section -->
     <section id="howtobuy">
         <div class="container">
-            <h2 class="section-title">How To Buy</h2>
+            <h2 class="section-title" data-text="How To Buy">How To Buy</h2>
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
@@ -744,7 +926,7 @@
     <!-- Social Links Section -->
     <section id="social">
         <div class="container">
-            <h2 class="section-title">Join The Crew</h2>
+            <h2 class="section-title" data-text="Join The Crew">Join The Crew</h2>
             <div class="social-grid">
                 <a href="#" class="social-link">
                     <span class="social-icon">🐦</span>
@@ -785,7 +967,62 @@
     </footer>
     
     <script>
-        // Smooth scrolling for anchor links
+        // === BOOT SEQUENCE ===
+        document.addEventListener('DOMContentLoaded', function() {
+            const bootSequence = document.getElementById('bootSequence');
+            
+            // Remove boot sequence on any key press or after 4 seconds
+            const removeBootSequence = () => {
+                bootSequence.style.display = 'none';
+                document.removeEventListener('keydown', removeBootSequence);
+            };
+            
+            document.addEventListener('keydown', removeBootSequence);
+            setTimeout(removeBootSequence, 4000);
+        });
+        
+        // === MATRIX RAIN EFFECT ===
+        const canvas = document.getElementById('matrixRain');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const characters = '01⚓🧭NESW$∞◊';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const char = characters[Math.floor(Math.random() * characters.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // === SMOOTH SCROLLING ===
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -799,24 +1036,53 @@
             });
         });
         
-        // Add glitch effect to title on hover
+        // === GLITCH EFFECT ON TITLE ===
         const title = document.querySelector('.hero h1');
         title.addEventListener('mouseenter', () => {
             title.classList.add('glitch');
             setTimeout(() => title.classList.remove('glitch'), 300);
         });
         
-        // Parallax effect for compass
+        // Random glitch on title every 10 seconds
+        setInterval(() => {
+            title.classList.add('glitch');
+            setTimeout(() => title.classList.remove('glitch'), 300);
+        }, 10000);
+        
+        // === PARALLAX EFFECT ===
         window.addEventListener('scroll', () => {
             const compass = document.querySelector('.compass-container');
             const scrolled = window.pageYOffset;
             compass.style.transform = `translateY(${scrolled * 0.3}px)`;
         });
         
-        // Console Easter Egg
+        // === CONSOLE EASTER EGG ===
         console.log('%c⚓ CAPTAIN JACK TERMINAL ⚓', 'color: #d4af37; font-size: 20px; font-weight: bold;');
         console.log('%cThe compass is broken. You decide where it points.', 'color: #00ff41; font-size: 14px;');
         console.log('%cDirection is a choice, savvy? 🏴‍☠️', 'color: #d4af37; font-size: 12px;');
+        console.log('%c', 'font-size: 1px; padding: 50px 100px; background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4=);');
+        
+        // === TYPING EFFECT FOR SECTIONS (on scroll) ===
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.token-card, .step').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
     </script>
 </body>
 </html>
