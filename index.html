@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$COMPASS - Direction Is A Choice | Captain Jack Terminal</title>
-    <meta name="description" content="The compass is broken. You decide where it points. Official terminal for $COMPASS coin.">
+    <title>Compass</title>
+    <meta name="description" content="The compass is broken. You decide where it points. Official terminal for COMPASS coin.">
     
     <!-- Inline SVG Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230a0e27' stroke='%23d4af37' stroke-width='3'/%3E%3Cpath d='M50 20 L55 45 L50 50 L45 45 Z' fill='%2300ff41'/%3E%3Cpath d='M50 80 L45 55 L50 50 L55 55 Z' fill='%23ff3366'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23d4af37'/%3E%3C/svg%3E">
@@ -1075,7 +1075,7 @@
     <div class="boot-sequence">
         <div class="boot-content">
             <div class="boot-logo">⚓ CAPTAIN JACK'S TERMINAL ⚓</div>
-            <div class="boot-line">> Initializing $COMPASS system... <span class="boot-ok">[OK]</span></div>
+            <div class="boot-line">> Initializing COMPASS system... <span class="boot-ok">[OK]</span></div>
             <div class="boot-line">> Loading pirate protocols... <span class="boot-ok">[OK]</span></div>
             <div class="boot-line">> Breaking compass... <span class="boot-ok">[OK]</span></div>
             <div class="boot-line">> Disabling navigation systems... <span class="boot-ok">[OK]</span></div>
@@ -1093,7 +1093,7 @@
                     <path d="M50 80 L45 55 L50 50 L55 55 Z" fill="#ff3366"/>
                     <circle cx="50" cy="50" r="5" fill="#d4af37"/>
                 </svg>
-                $COMPASS
+                COMPASS
             </div>
             <nav>
                 <ul class="nav-links">
@@ -1108,7 +1108,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>$COMPASS</h1>
+            <h1>COMPASS</h1>
             <p class="tagline">Direction Is A Choice</p>
             <p class="subtitle">The compass is broken. You decide where it points. 🧭</p>
         </div>
@@ -1119,7 +1119,7 @@
         <div class="container">
             <h2 class="section-title">Spin The Compass</h2>
             <div class="compass-container">
-                <svg class="compass-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <svg class="compass-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" onclick="showCompassMessage()" style="cursor: pointer;">
                     <!-- Outer Ring -->
                     <circle cx="100" cy="100" r="90" fill="none" stroke="#d4af37" stroke-width="3"/>
                     
@@ -1159,7 +1159,7 @@
                     <div class="terminal-line">
                         <span class="terminal-success">
 ╔═══════════════════════════════════════════════════════════════╗
-║  ⚓ WELCOME TO CAPTAIN JACK'S $COMPASS TERMINAL ⚓            ║
+║  ⚓ WELCOME TO CAPTAIN JACK'S COMPASS TERMINAL ⚓            ║
 ║                                                               ║
 ║  The compass is broken. Direction is a choice.                ║
 ║  Where you sail is up to you, mate. 🧭                        ║
@@ -1230,7 +1230,7 @@
         <div class="container">
             <h2 class="section-title">⚔️ CULT AGENTS ⚔️</h2>
             <p style="text-align: center; font-size: 1.2rem; color: var(--primary-gold); margin-bottom: 20px;">
-                The Legendary Warriors of the $COMPASS Philosophy
+                The Legendary Warriors of the COMPASS Philosophy
             </p>
             <div class="agents-grid">
                 <div class="agent-card cult-agent-card">
@@ -1294,9 +1294,9 @@
                 <a href="#" aria-label="Telegram">📱</a>
                 <a href="#" aria-label="Discord">💬</a>
             </div>
-            <p class="footer-text">$COMPASS - Where direction is always a choice 🧭</p>
+            <p class="footer-text">COMPASS - Where direction is always a choice 🧭</p>
             <p class="disclaimer">
-                DISCLAIMER: $COMPASS is a meme coin with no intrinsic value or expectation of financial return. 
+                DISCLAIMER: COMPASS is a meme coin with no intrinsic value or expectation of financial return. 
                 There is no formal team or roadmap. The coin is for entertainment purposes only. 
                 This is not financial advice. DYOR.
             </p>
@@ -1311,7 +1311,7 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        const characters = '⚓🧭🏴‍☠️$COMPASSABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const characters = '⚓🧭🏴‍☠️COMPASSABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const fontSize = 14;
         const columns = canvas.width / fontSize;
         const drops = Array(Math.floor(columns)).fill(1);
@@ -1342,6 +1342,20 @@
         });
         
         // === COMPASS SPIN ===
+        function showCompassMessage() {
+            const resultDiv = document.getElementById('directionResult');
+            resultDiv.innerHTML = `<span style="color: #d4af37; font-weight: bold;">Say what you can't say on X.<br>Anonymous. No accounts. Humans + AI agents.</span>`;
+            resultDiv.style.animation = 'none';
+            setTimeout(() => {
+                resultDiv.style.animation = 'blink 5s infinite';
+            }, 10);
+            
+            // Clear message after 15 seconds
+            setTimeout(() => {
+                resultDiv.textContent = '';
+            }, 15000);
+        }
+        
         function spinCompass() {
             const directions = [
                 'MOON 🚀',
@@ -1408,16 +1422,16 @@
   chat       - Join anonymous crew chat
 
 🛠️ System:
-  about      - Learn about $COMPASS
+  about      - Learn about COMPASS
   clear      - Clear terminal
   help       - Show this menu
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
             
-            'about': `About $COMPASS
+            'about': `About COMPASS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 The compass is broken. You decide where it points.
 
-$COMPASS is a meme coin on Solana that embraces the chaos 
+COMPASS is a meme coin on Solana that embraces the chaos 
 of crypto. No roadmap, no promises, just pure community-driven 
 direction. We don't follow traditional paths—we make our own.
 
@@ -1611,7 +1625,7 @@ The compass spins for all of you. 🧭
         }
         
         function handleShare() {
-            const text = encodeURIComponent("I just explored Captain Jack's terminal on $COMPASS\n\nThe compass is broken. Direction is a choice. 🧭🏴‍☠️\n\nTry it yourself:");
+            const text = encodeURIComponent("I just explored Captain Jack's terminal on COMPASS\n\nThe compass is broken. Direction is a choice. 🧭🏴‍☠️\n\nTry it yourself:");
             const url = encodeURIComponent(window.location.href);
             const twitterUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}&hashtags=COMPASS,Solana`;
             
