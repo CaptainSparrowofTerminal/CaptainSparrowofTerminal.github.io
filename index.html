@@ -1537,6 +1537,105 @@
         }
         .net-banner.show{ display:block; }
     
+
+/* --- Gem Hunt --- */
+.gemhunt-card{
+    margin-top:18px;
+    padding:16px 16px 14px;
+    border-radius:16px;
+    border:1px solid rgba(255, 0, 80, .35);
+    background: linear-gradient(180deg, rgba(20,22,44,.85), rgba(10,12,28,.92));
+    box-shadow: 0 10px 28px rgba(0,0,0,.35);
+}
+.gemhunt-title{
+    font-weight:800;
+    letter-spacing:.5px;
+    color: rgba(92, 255, 178, .95);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.gemhunt-badge{
+    font-size:.75rem;
+    opacity:.8;
+    color: rgba(255,255,255,.7);
+}
+.gemhunt-field{ margin-bottom:10px; }
+.gemhunt-label{
+    display:block;
+    font-size:.82rem;
+    opacity:.8;
+    margin-bottom:6px;
+}
+.gemhunt-input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.25);
+    color: rgba(255,255,255,.92);
+    outline:none;
+}
+.gemhunt-input:focus{
+    border-color: rgba(255, 0, 80, .55);
+    box-shadow: 0 0 0 3px rgba(255,0,80,.15);
+}
+.gemhunt-btn{
+    width:100%;
+    margin-top:6px;
+    padding:12px 12px;
+    border:0;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:800;
+    color:#05150e;
+    background: linear-gradient(90deg, rgba(92,255,178,1), rgba(0, 214, 255, .95));
+    box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    transition: transform .08s ease, filter .08s ease;
+}
+.gemhunt-btn:hover{ filter: brightness(1.02); }
+.gemhunt-btn:active{ transform: translateY(1px); }
+.gemhunt-hint{
+    margin-top:10px;
+    font-size:.78rem;
+    opacity:.65;
+    line-height:1.25rem;
+}
+.gemhunt-pulse{
+    animation: gemPulse 1.1s ease-in-out 2;
+}
+@keyframes gemPulse{
+    0%{ box-shadow: 0 0 0 rgba(255,0,80,0); }
+    50%{ box-shadow: 0 0 0 6px rgba(255,0,80,.18); }
+    100%{ box-shadow: 0 0 0 rgba(255,0,80,0); }
+}
+
+
+/* === GEM HUNT / Long text overflow fix === */
+.post-content, .postContent, .post-text, .tweet-text, .content, .post-body {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.contract-address {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+.copy-ca {
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,0,76,.85);
+  background: rgba(255,0,76,.08);
+  color: rgba(255,255,255,.92);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+}
+.copy-ca:hover {
+  background: rgba(255,0,76,.25);
+}
+
 </style>
 </head>
 <body>
@@ -1611,6 +1710,18 @@
                     </span>
                     <span class="nav-text">Trending</span>
                 </li>
+
+                <li class="nav-item" onclick="openGemHuntPanel()">
+                    <span class="nav-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 3h12l4 6-10 12L2 9l4-6z"></path>
+                            <path d="M2 9h20"></path>
+                            <path d="M12 21L6 9l6-6 6 6-6 12z"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Gem Hunt</span>
+                </li>
+
                 <li class="nav-item" onclick="switchPage('search')">
                     <span class="nav-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2046,6 +2157,23 @@
                 <div id="whoToFollowList">
                     <!-- Users will be loaded dynamically -->
                 </div>
+
+                <div class="gemhunt-card" id="gemHuntCard">
+                    <div class="gemhunt-title">💎 GEM HUNT <span class="gemhunt-badge">(ALPHA)</span></div>
+                    <div class="gemhunt-field">
+                        <label class="gemhunt-label" for="gemSticker">Sticker</label>
+                        <input id="gemSticker" class="gemhunt-input" placeholder="$STICKER" maxlength="15" />
+                    </div>
+                    <div class="gemhunt-field">
+                        <label class="gemhunt-label" for="gemContract">Contract Address</label>
+                        <input id="gemContract" class="gemhunt-input" placeholder="Paste Solana contract address" />
+                    </div>
+                    <button class="gemhunt-btn" onclick="shareGemSignal()">
+                        Share Signal <span style="margin-left:8px;">🏴‍☠️</span>
+                    </button>
+                    <div class="gemhunt-hint">Tip: This will post to your feed as a <b>#GEMHUNT</b> signal.</div>
+                </div>
+
             </div>
         </aside>
     </div>
@@ -5598,6 +5726,67 @@ currentUser = null;
         }
         // ===== End Trending =====
 
+
+/* --- Gem Hunt helpers --- */
+function openGemHuntPanel(){
+    try{
+        const card = document.getElementById('gemHuntCard');
+        if(!card) return;
+        // ensure right sidebar is visible (we keep it on home)
+        card.scrollIntoView({behavior:'smooth', block:'center'});
+        card.classList.remove('gemhunt-pulse');
+        // reflow
+        void card.offsetWidth;
+        card.classList.add('gemhunt-pulse');
+    }catch(e){}
+}
+
+function isLikelySolanaAddress(addr){
+    if(!addr) return false;
+    const a = addr.trim();
+    if(a.length < 32 || a.length > 44) return false;
+    // base58-ish (no 0,O,I,l)
+    return /^[1-9A-HJ-NP-Za-km-z]+$/.test(a);
+}
+
+function shareGemSignal(){
+    if(!currentUser){
+        showToast('Please login first.');
+        return;
+    }
+    const stickerEl = document.getElementById('gemSticker');
+    const contractEl = document.getElementById('gemContract');
+    const stickerRaw = (stickerEl?.value || '').trim();
+    const contractRaw = (contractEl?.value || '').trim();
+
+    const sticker = stickerRaw ? (stickerRaw.startsWith('$') ? stickerRaw : ('$' + stickerRaw)) : '$STICKER';
+    if(!isLikelySolanaAddress(contractRaw)){
+        showToast('Please enter a valid Solana contract address.');
+        contractEl?.focus();
+        return;
+    }
+
+    // Build post text
+    const text = `💎 GEM HUNT (ALPHA)\nSticker: ${sticker}\nCA: ${contractRaw}\n#GEMHUNT`;
+    // Use existing createPost flow without touching auth.
+    const textarea = document.getElementById('postTextarea');
+    if(textarea){
+        textarea.value = text;
+        textarea.dispatchEvent(new Event('input', {bubbles:true}));
+        // Ensure home page (post box exists)
+        switchPage('home');
+        // Post
+        createPost();
+        // Clear gemhunt inputs (UI)
+        if(stickerEl) stickerEl.value = '';
+        if(contractEl) contractEl.value = '';
+        showToast('Gem Hunt signal posted!');
+        openGemHuntPanel();
+    } else {
+        showToast('Post box not available.');
+    }
+}
+
 </script>
 
     <!-- Notifications Overlay (failsafe) -->
@@ -5617,5 +5806,74 @@ currentUser = null;
 
 <div class="mobile-backdrop" onclick="toggleMobileSidebar(false)"></div>
 <div id="netBanner" class="net-banner">You are offline. Some features may not work.</div>
+
+<script>
+/* === GEM HUNT CA helpers (wrap + copy + shorten) === */
+(function(){
+  function shortenCA(s){
+    if(!s) return "";
+    if(s.length <= 14) return s;
+    return s.slice(0,6) + "..." + s.slice(-4);
+  }
+
+  function hydrateCAs(root){
+    (root||document).querySelectorAll(".contract-address[data-full]").forEach(function(el){
+      var full = el.getAttribute("data-full") || "";
+      if(!el.getAttribute("data-hydrated")){
+        el.textContent = shortenCA(full);
+        el.setAttribute("title", full);
+        el.setAttribute("data-hydrated","1");
+      }
+    });
+  }
+
+  document.addEventListener("click", function(e){
+    var btn = (e.target.closest ? e.target.closest(".copy-ca") : null);
+    if(!btn) return;
+    var wrap = btn.parentElement;
+    if(!wrap) return;
+    var caEl = wrap.querySelector(".contract-address");
+    var full = caEl && (caEl.getAttribute("data-full") || caEl.textContent || "");
+    if(!full) return;
+
+    function flash(){
+      var prev = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(function(){ btn.textContent = prev; }, 1200);
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(full).then(flash).catch(function(){
+        var tmp = document.createElement("textarea");
+        tmp.value = full;
+        tmp.style.position="fixed";
+        tmp.style.left="-9999px";
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand("copy");
+        document.body.removeChild(tmp);
+        flash();
+      });
+    } else {
+      var tmp = document.createElement("textarea");
+      tmp.value = full;
+      tmp.style.position="fixed";
+      tmp.style.left="-9999px";
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand("copy");
+      document.body.removeChild(tmp);
+      flash();
+    }
+  }, true);
+
+  document.addEventListener("DOMContentLoaded", function(){
+    hydrateCAs(document);
+  });
+
+  window.__compassHydrateCAs = hydrateCAs;
+})();
+</script>
+
 </body>
 </html>
