@@ -1636,6 +1636,38 @@
   background: rgba(255,0,76,.25);
 }
 
+.risk-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-left:8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+  color: rgba(255,255,255,0.85);
+  font-weight: 800;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.risk-badge.low{ border-color: rgba(20,241,149,0.35); color: rgba(20,241,149,0.95); background: rgba(20,241,149,0.08); }
+.risk-badge.medium{ border-color: rgba(255,215,0,0.35); color: rgba(255,215,0,0.95); background: rgba(255,215,0,0.07); }
+.risk-badge.high{ border-color: rgba(255,51,102,0.45); color: rgba(255,51,102,0.98); background: rgba(255,51,102,0.08); }
+
+
+/* ===== Gem Hunt overflow + long text safety (v17) ===== */
+#gemAnalysisPanel, #gemAnalysisPanel * { min-width: 0; }
+#gemAnalysisPanel .contract-address, #gemAnalysisPanel #gemRiskExplain, #gemAnalysisPanel #gemTASummary { overflow-wrap:anywhere; word-break: break-word; }
+@media (max-width: 420px){
+  #gemAnalysisPanel { padding: 10px !important; }
+  #gemAnalysisPanel [id^="gem"] { max-width: 100%; }
+}
+/* ===== End v17 ===== */
+
+/* === v19: Gem Hunt overflow hardening (mobile) === */
+.gemhunt-card { overflow: hidden; }
+.gemhunt-card * { overflow-wrap: anywhere; word-break: break-word; }
+
 </style>
 </head>
 <body>
@@ -1935,11 +1967,26 @@
                 <div class="feed-header">
                     <h1 class="feed-title">🔥 Trending</h1>
                 </div>
-                <div style="padding: 40px; text-align: center; color: var(--text-white); opacity: 0.5;">
-                    Coming soon! 🏴‍☠️
+
+                <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap: wrap;">
+                        <div style="color: var(--text-white); opacity: 0.85; line-height:1.4;">
+                            <div style="font-weight:800; color: var(--primary-gold);">Trending Coins (last 24h)</div>
+                            <div style="font-size:0.9rem; opacity:0.8;">Based on contract addresses (CAs) mentioned in posts.</div>
+                        </div>
+                        <button class="mark-read-btn" onclick="loadTrendingCoins(true)">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="feed-posts" id="trendingCoinsList" style="padding: 16px 10px;">
+                    <div style="padding: 30px; text-align:center; opacity:0.6;">Loading trending coins…</div>
+                </div>
+
+                <div style="padding: 8px 18px 18px; color: rgba(224,224,224,0.6); font-size:0.85rem; line-height:1.4;">
+                    Tip: Paste any CA into <b>Gem Hunt</b> to analyze and share.
                 </div>
             </div>
-            
+
             <!-- Search Page -->
             <div id="searchPage" style="display: none;">
                 <div class="feed-header">
@@ -2168,9 +2215,75 @@
                         <label class="gemhunt-label" for="gemContract">Contract Address</label>
                         <input id="gemContract" class="gemhunt-input" placeholder="Paste Solana contract address" />
                     </div>
-                    <button class="gemhunt-btn" onclick="shareGemSignal()">
-                        Share Signal <span style="margin-left:8px;">🏴‍☠️</span>
-                    </button>
+                    <div style="display:flex; gap:10px; margin-top:6px;">
+                        <button class="gemhunt-btn" style="flex:1;" onclick="shareGemSignal()">
+                            Share Signal <span style="margin-left:8px;">🏴‍☠️</span>
+                        </button>
+                        <button class="gemhunt-btn" style="flex:1; background: linear-gradient(90deg, rgba(255,215,0,.95), rgba(255,0,128,.9)); color:#081024;" onclick="analyzeGemHunt()">
+                            Analyze <span style="margin-left:8px;">🧭</span>
+                        </button>
+                    </div>
+
+                                        </div>
+
+                    <div id="gemAnalysisPanel" style="display:none; margin-top:12px; padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18);">
+                        <div id="gemAnalysisLoading" style="opacity:.8; font-size:.9rem;">Loading…</div>
+                        <div id="gemAnalysisError" style="display:none; color: #ff3366; font-size:.9rem; margin-top:8px;"></div>
+
+                        <div id="gemAnalysisBody" style="display:none;">
+                            <div style="display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap;">
+                                <div style="font-weight:900; letter-spacing:.4px;" id="gemTokenTitle">Token</div>
+                                <div style="font-size:.85rem; opacity:.7;" id="gemPairMeta"></div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px;">
+                                <div style="padding:10px; border-radius:12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);">
+                                    <div style="font-size:.78rem; opacity:.7;">Price (USD)</div>
+                                    <div style="font-weight:900; font-size:1.05rem;" id="gemPriceUsd">—</div>
+                                </div>
+                                <div style="padding:10px; border-radius:12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);">
+                                    <div style="font-size:.78rem; opacity:.7;">Liquidity (USD)</div>
+                                    <div style="font-weight:900; font-size:1.05rem;" id="gemLiquidityUsd">—</div>
+                                </div>
+                                <div style="padding:10px; border-radius:12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);">
+                                    <div style="font-size:.78rem; opacity:.7;">Market Cap / FDV</div>
+                                    <div style="font-weight:900; font-size:1.05rem;" id="gemMcap">—</div>
+                                </div>
+                                <div style="padding:10px; border-radius:12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);">
+                                    <div style="font-size:.78rem; opacity:.7;">24h Volume</div>
+                                    <div style="font-weight:900; font-size:1.05rem;" id="gemVol24">—</div>
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px;">
+                                <div style="padding:10px; border-radius:12px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);">
+    <div style="font-size:.78rem; opacity:.7;">Trader Engine</div>
+    <div style="font-weight:900; font-size:1.02rem; overflow-wrap:anywhere;" id="gemTAHeadline">—</div>
+    <div style="font-size:.78rem; opacity:.65; margin-top:4px; line-height:1.15rem; overflow-wrap:anywhere;" id="gemTASummary"></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+        <div style="padding:6px 8px; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); font-size:.78rem; opacity:.9;" id="gemRSIBadge">RSI: —</div>
+        <div style="padding:6px 8px; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); font-size:.78rem; opacity:.9;" id="gemBBBadge">BB: —</div>
+    </div>
+    <div style="margin-top:10px; font-size:.80rem; opacity:.85; line-height:1.15rem;">
+        <div><b>Entry Zone:</b> <span id="gemEntryZone">—</span></div>
+        <div style="margin-top:4px;"><b>Stop:</b> <span id="gemStop">—</span> • <b>TP:</b> <span id="gemTP">—</span></div>
+    </div>
+</div>
+                                <div style="padding:10px; border-radius:12px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);">
+                                    <div style="font-size:.78rem; opacity:.7;">Rug Risk</div>
+                                    <div style="font-weight:900; font-size:1.02rem;" id="gemRisk">—</div>
+                                    <div style="font-size:.78rem; opacity:.65; margin-top:4px;" id="gemRiskExplain"></div>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                                <a id="gemDexLink" target="_blank" class="gemhunt-btn" style="flex:1; text-decoration:none; text-align:center; padding:10px 12px; background: rgba(255,255,255,.07); color: rgba(255,255,255,.92);">Open DexScreener</a>
+                                <button class="gemhunt-btn" style="flex:1; padding:10px 12px;" onclick="postGemAnalysisToFeed()">Post analysis</button>
+                            </div>
+
+                            </div>
+                    </div>
+
                     <div class="gemhunt-hint">Tip: This will post to your feed as a <b>#GEMHUNT</b> signal.</div>
                 </div>
 
@@ -2876,16 +2989,20 @@ currentUser = null;
         async function createPost() {
             const textarea = document.getElementById('postTextarea');
             const text = textarea.value.trim();
-            
+
             if (!text && !selectedImage) return;
             if (!currentUser) return;
-            
+
             const postButton = document.getElementById('postButton');
             postButton.disabled = true;
             postButton.textContent = 'Posting...';
-            
+
             try {
                 const postsRef = window.firebaseRef(window.firebaseDB, 'posts');
+
+                // Extract Solana contract addresses from text (base58, 32-44 chars)
+                const contracts = extractContractsFromText(text);
+
                 const postData = {
                     userId: currentUser.userId,
                     username: currentUser.username,
@@ -2895,20 +3012,37 @@ currentUser = null;
                     likes: 0,
                     comments: 0,
                     reposts: 0,
-                    views: 0
+                    views: 0,
+                    contracts: contracts
                 };
-                
+
                 // Add image if selected
                 if (selectedImage) {
                     postData.image = selectedImage;
                 }
-                
-                await window.firebasePush(postsRef, postData);
-                
+
+                // Create post with key (so we can tie mention events to postId)
+                const newPostRef = window.firebasePush(postsRef);
+                await window.firebaseSet(newPostRef, postData);
+                const postId = newPostRef.key;
+
+                // Record CA mention events for trending (best-effort, non-blocking)
+                try {
+                    await recordMentionEvents(contracts, {
+                        userId: currentUser.userId,
+                        username: currentUser.username,
+                        pirateName: currentUser.pirateName,
+                        postId: postId,
+                        ts: postData.timestamp
+                    });
+                } catch (e2) {
+                    console.warn('Mention tracking error (non-fatal):', e2);
+                }
+
                 textarea.value = '';
                 removeImage();
                 console.log('✅ Post created');
-                
+
             } catch (e) {
                 console.error('Post error:', e);
                 alert('Error posting. Image might be too large.');
@@ -2917,8 +3051,254 @@ currentUser = null;
                 postButton.textContent = 'Post';
             }
         }
+
         
-        async function loadFeed() {
+        
+        // ===== Compass Alpha Engine (v14) =====
+        function extractContractsFromText(text) {
+            if (!text) return [];
+            const re = /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g;
+            const matches = text.match(re) || [];
+            // de-dup + cap to prevent spam
+            const uniq = [];
+            const seen = new Set();
+            for (const m of matches) {
+                if (!seen.has(m)) {
+                    seen.add(m);
+                    uniq.push(m);
+                }
+                if (uniq.length >= 5) break;
+            }
+            return uniq;
+        }
+
+        async function recordMentionEvents(contracts, meta) {
+            if (!contracts || contracts.length === 0) return;
+            const eventsRef = window.firebaseRef(window.firebaseDB, 'mentionEvents');
+            const summariesRoot = window.firebaseRef(window.firebaseDB, 'mentions');
+            const now = meta && meta.ts ? meta.ts : Date.now();
+
+            // Write one event per CA (append-only log)
+            const writes = contracts.map(async (ca) => {
+                await window.firebasePush(eventsRef, {
+                    ca: ca,
+                    ts: now,
+                    userId: meta.userId || null,
+                    username: meta.username || null,
+                    pirateName: meta.pirateName || null,
+                    postId: meta.postId || null
+                });
+
+                // Best-effort lightweight summary for quick lookup
+                const sumRef = window.firebaseRef(window.firebaseDB, 'mentions/' + ca);
+                const snap = await window.firebaseGet(sumRef);
+                const prev = snap.exists() ? snap.val() : {};
+                const total = (prev.total || 0) + 1;
+                const last = now;
+                await window.firebaseSet(sumRef, {
+                    total: total,
+                    last: last
+                });
+            });
+
+            await Promise.allSettled(writes);
+        }
+
+        async function loadTrendingCoins(force = false) {
+            // Render trending based on last N mention events within 24h
+            const listEl = document.getElementById('trendingCoinsList');
+            if (!listEl) return;
+
+            listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.65;">Loading trending coins…</div>';
+
+            try {
+                const cutoff = Date.now() - (24 * 60 * 60 * 1000);
+
+                const q = window.firebaseQuery(
+                    window.firebaseRef(window.firebaseDB, 'mentionEvents'),
+                    window.firebaseOrderByChild('ts'),
+                    window.firebaseLimitToLast(2500)
+                );
+
+                const snap = await window.firebaseGet(q);
+                const counts = new Map();
+                const lastTs = new Map();
+
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const ev = child.val();
+                        if (!ev || !ev.ca || !ev.ts) return;
+                        if (ev.ts < cutoff) return;
+
+                        counts.set(ev.ca, (counts.get(ev.ca) || 0) + 1);
+                        lastTs.set(ev.ca, Math.max(lastTs.get(ev.ca) || 0, ev.ts));
+                    });
+                }
+
+                const items = Array.from(counts.entries())
+                    .map(([ca, c]) => ({ ca, count: c, last: lastTs.get(ca) || 0 }))
+                    .sort((a, b) => (b.count - a.count) || (b.last - a.last))
+                    .slice(0, 25);
+
+                renderTrendingCoins(items);
+            } catch (e) {
+                console.error('Trending load error:', e);
+                listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.7;">Could not load trending yet. Post some CAs first. 🏴‍☠️</div>';
+            }
+        }
+
+        function renderTrendingCoins(items) {
+            const listEl = document.getElementById('trendingCoinsList');
+            if (!listEl) return;
+
+            if (!items || items.length === 0) {
+                listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.7;">No CA mentions in the last 24h yet. Share a CA to start the radar. 🧭</div>';
+                return;
+            }
+
+            const rows = items.map((it, idx) => {
+                const short = (it.ca && it.ca.length > 14) ? (it.ca.slice(0,6) + '...' + it.ca.slice(-4)) : it.ca;
+                const ago = getTimeAgo(it.last);
+                return `
+                    <div class="post" style="margin-bottom: 12px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                            <div style="min-width:0;">
+                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                    <div style="font-weight:900; color: var(--primary-gold);">#${idx+1}</div>
+                                    <div class="ca-wrap" style="display:inline-flex; align-items:center; gap:8px;">
+                                        <span class="contract-address" data-full="${it.ca}">${short}</span>
+                                        <button class="copy-ca" type="button" data-ca="${it.ca}">Copy</button>
+                                        <a href="#" class="analyze-ca" data-ca="${it.ca}" style="color: rgba(92,255,178,.95); font-weight:900; text-decoration:none;">Analyze</a>
+                                        <a href="https://dexscreener.com/solana/${it.ca}" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.65); text-decoration:none; font-weight:700;">Chart ↗</a>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 8px; font-size:0.9rem; color: rgba(224,224,224,0.75);">
+                                    Mentions: <b style="color: var(--text-white);">${it.count}</b>
+                                    <span style="opacity:0.7;">· last mentioned ${ago}</span> <span class="risk-badge" data-ca="${it.ca}">Risk: —</span>
+                                </div>
+                            </div>
+                            <button class="post-button" style="padding: 10px 16px; border-radius: 14px;" onclick="prefillComposerWithCA('${it.ca}')">Post</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.innerHTML = rows;
+
+            try { if (window.__compassHydrateCAs) window.__compassHydrateCAs(listEl); } catch (e) {}
+            try { if (window.__compassHydrateTrendingBadges) window.__compassHydrateTrendingBadges(listEl); } catch (e) {}
+        }
+
+        function prefillComposerWithCA(ca) {
+            switchPage('home');
+            const ta = document.getElementById('postTextarea');
+            if (ta) {
+                const prefix = ta.value && ta.value.trim().length > 0 ? (ta.value.trim() + '\n') : '';
+                ta.value = prefix + ca + ' ';
+                ta.focus();
+            }
+            showToast('CA inserted into composer.');
+        }
+
+        function openGemHuntPanelWithCA(ca) {
+            // Open panel + prefill CA, then auto-run Analyze if available
+            openGemHuntPanel();
+            const caTrim = (ca || '').trim();
+            const input = document.getElementById('gemContract') || document.getElementById('gemhuntCA') || document.getElementById('gemHuntCA') || document.getElementById('gemHuntInput') || document.getElementById('gemhuntInput') || document.getElementById('contractInput');
+            if (input) input.value = caTrim;
+
+            // Try to focus the input for clarity
+            try { input && input.focus && input.focus(); } catch (e) {}
+
+            // If analysis engine exists, run it directly
+            if (typeof analyzeGemHunt === 'function') {
+                try { analyzeGemHunt(); } catch (e) {}
+            } else {
+                // Fallback: try clicking any known analyze buttons
+                const btnIds = ['gemhuntAnalyzeBtn','gemhuntBtn','gemHuntBtn','analyzeBtn','analyzeGemBtn'];
+                for (const id of btnIds) {
+                    const b = document.getElementById(id);
+                    if (b) { b.click(); break; }
+                }
+            }
+            showToast('Opening Gem Hunt for CA…');
+        }
+
+        // Analyze CA link handler
+        document.addEventListener('click', function(e) {
+            const a = e.target.closest ? e.target.closest('a.analyze-ca') : null;
+            if (!a) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const ca = a.getAttribute('data-ca');
+            if (ca) openGemHuntPanelWithCA(ca);
+        }, true);
+
+        
+        // --- Trending risk badges + analysis cache (v16) ---
+        async function cacheGemAnalysisToFirebase(analysis){
+            try{
+                if(!analysis || !analysis.mint || !window.firebaseReady) return;
+                const payload = {
+                    ts: Date.now(),
+                    mint: analysis.mint,
+                    symbol: analysis.base?.symbol || null,
+                    name: analysis.base?.name || null,
+                    priceUsd: analysis.priceUsd ?? null,
+                    liquidityUsd: analysis.liquidityUsd ?? null,
+                    mcap: analysis.mcap ?? null,
+                    fdv: analysis.fdv ?? null,
+                    vol24: analysis.vol24 ?? null,
+                    top10Pct: analysis.top10Pct ?? null,
+                    risk: analysis.risk?.risk ?? null,
+                    riskLabel: analysis.risk?.label ?? null,
+                    dexUrl: analysis.dexUrl ?? null
+                };
+                await window.firebaseSet(window.firebaseRef(window.firebaseDB, `analysisCache/${analysis.mint}`), payload);
+            }catch(e){
+                console.warn('cacheGemAnalysisToFirebase failed:', e);
+            }
+        }
+
+        window.__compassHydrateTrendingBadges = async function(root){
+            try{
+                const scope = root || document;
+                const badges = Array.from(scope.querySelectorAll('.risk-badge[data-ca]'));
+                if(!badges.length || !window.firebaseReady) return;
+
+                // de-dupe CAs
+                const cas = Array.from(new Set(badges.map(b=> (b.getAttribute('data-ca')||'').trim()).filter(Boolean)));
+                const cache = new Map();
+
+                await Promise.all(cas.map(async (ca)=>{
+                    try{
+                        const snap = await window.firebaseGet(window.firebaseRef(window.firebaseDB, `analysisCache/${ca}`));
+                        if(snap && snap.exists()) cache.set(ca, snap.val());
+                    }catch(e){}
+                }));
+
+                badges.forEach(b=>{
+                    const ca = (b.getAttribute('data-ca')||'').trim();
+                    const v = cache.get(ca);
+                    if(!v || v.risk == null || !v.riskLabel){
+                        b.textContent = 'Risk: —';
+                        b.classList.remove('low','medium','high');
+                        return;
+                    }
+                    const label = String(v.riskLabel);
+                    const emoji = (label === 'High') ? '🔴' : (label === 'Medium' ? '🟡' : '🟢');
+                    b.textContent = `Risk: ${emoji} ${label} (${v.risk}/100)`;
+                    b.classList.remove('low','medium','high');
+                    b.classList.add(label === 'High' ? 'high' : (label === 'Medium' ? 'medium' : 'low'));
+                });
+            }catch(e){
+                console.warn('hydrate trending badges failed:', e);
+            }
+        };
+        // --- End v16 ---
+// ===== End Alpha Engine (v14) =====
+
+async function loadFeed() {
             if (!currentUser) return;
             
             try {
@@ -3121,6 +3501,11 @@ currentUser = null;
                     </div>
                 </div>
             `;
+
+            // Hydrate contract addresses (shorten + enable copy) inside newly rendered post
+            try {
+                if (window.__compassHydrateCAs) window.__compassHydrateCAs(div);
+            } catch (e) {}
             
             // Add event listeners programmatically
             const commentBtn = div.querySelector('.post-stat-comment');
@@ -3504,6 +3889,8 @@ currentUser = null;
                 document.querySelectorAll('.nav-item')[0].classList.add('active');
             } else if (page === 'trending') {
                 safeSetDisplay('trendingPage','block');
+                // Load trending coins radar
+                try { loadTrendingCoins(); } catch (e) {}
                 document.querySelectorAll('.nav-item')[1].classList.add('active');
             } else if (page === 'search') {
                 safeSetDisplay('searchPage','block');
@@ -5195,15 +5582,31 @@ currentUser = null;
         function linkifyText(text) {
             if (!text) return '';
             const escaped = escapeHtml(text);
+
+            // Hashtags
             const withTags = escaped.replace(/(^|\s)(#[a-zA-Z0-9_]{2,50})/g, (m, p1, tag) => {
                 const t = tag.substring(1);
                 return `${p1}<a href="#" class="link-tag" data-linktype="hashtag" data-tag="${t}">${tag}</a>`;
             });
+
+            // Mentions
             const withMentions = withTags.replace(/(^|\s)(@[a-zA-Z0-9_]{2,30})/g, (m, p1, handle) => {
                 const u = handle.substring(1);
                 return `${p1}<a href="#" class="link-mention" data-linktype="mention" data-username="${u}">${handle}</a>`;
             });
-            return withMentions;
+
+            // Solana contract addresses (base58, 32-44 chars)
+            // Render: shortened CA + Copy + Analyze
+            const caRegex = /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g;
+            const withCAs = withMentions.replace(caRegex, (full) => {
+                return `<span class="ca-wrap" style="display:inline-flex; align-items:center; gap:6px; padding: 2px 6px; border-radius: 10px; border: 1px solid rgba(255,0,76,.55); background: rgba(255,0,76,.08);">
+                    <span class="contract-address" data-full="${full}">${full}</span>
+                    <button class="copy-ca" type="button" data-ca="${full}" title="Copy CA">Copy</button>
+                    <a href="#" class="analyze-ca" data-ca="${full}" style="color: rgba(92,255,178,.95); font-weight:800; text-decoration:none;">Analyze</a>
+                </span>`;
+            });
+
+            return withCAs;
         }
 
         function handleLinkifiedClick(e) {
@@ -5786,6 +6189,413 @@ function shareGemSignal(){
         showToast('Post box not available.');
     }
 }
+
+/* --- Gem Hunt: Analysis Engine (v15) --- */
+let lastGemAnalysis = null;
+
+function formatCompact(n){
+    if(n === null || n === undefined || n === '') return '—';
+    const num = Number(n);
+    if(!isFinite(num)) return String(n);
+    const abs = Math.abs(num);
+    const fmt = (v, s) => (v.toFixed(v >= 100 ? 0 : (v >= 10 ? 1 : 2)) + s);
+    if(abs >= 1e12) return fmt(num/1e12, 'T');
+    if(abs >= 1e9) return fmt(num/1e9, 'B');
+    if(abs >= 1e6) return fmt(num/1e6, 'M');
+    if(abs >= 1e3) return fmt(num/1e3, 'K');
+    return num.toFixed(num >= 1 ? 4 : 8).replace(/0+$/,'').replace(/\.$/,'');
+}
+
+function formatUsd(n){
+    if(n === null || n === undefined) return '—';
+    const num = Number(n);
+    if(!isFinite(num)) return '—';
+    if(num >= 1) return '$' + num.toLocaleString(undefined, {maximumFractionDigits: 4});
+    return '$' + num.toFixed(8).replace(/0+$/,'').replace(/\.$/,'');
+}
+
+function getLocalKey(k){ try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } }
+function setLocalKey(k,v){ try{ localStorage.setItem(k, v || ''); }catch(e){} }
+function delLocalKey(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+function saveGemKeys(){
+    const helius = (document.getElementById('heliusKeyInput')?.value || '').trim();
+    if(helius) setLocalKey('COMPASS_HELIUS_KEY', helius);
+    else delLocalKey('COMPASS_HELIUS_KEY');
+    showToast('Keys saved locally.');
+}
+function clearGemKeys(){
+    delLocalKey('COMPASS_HELIUS_KEY');
+    const el = document.getElementById('heliusKeyInput');
+    if(el) el.value = '';
+    showToast('Keys cleared.');
+}
+
+async function dexPairsForTokenSolana(mint){
+    const url = `https://api.dexscreener.com/token-pairs/v1/solana/${mint}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('DexScreener request failed');
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0) return [];
+    return data;
+}
+
+function pickBestPair(pairs){
+    // Prefer highest liquidity USD, then volume
+    return pairs
+        .slice()
+        .sort((a,b)=>{
+            const la = Number(a?.liquidity?.usd || 0);
+            const lb = Number(b?.liquidity?.usd || 0);
+            if(lb !== la) return lb-la;
+            const va = Number(a?.volume?.h24 || 0);
+            const vb = Number(b?.volume?.h24 || 0);
+            return vb-va;
+        })[0] || null;
+}
+
+async function heliusRpc(method, params){
+    const key = getLocalKey('COMPASS_HELIUS_KEY');
+    if(!key) throw new Error('NO_HELIUS_KEY');
+    const url = `https://mainnet.helius-rpc.com/?api-key=${encodeURIComponent(key)}`;
+    const body = { jsonrpc: "2.0", id: "1", method, params };
+    const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if(!res.ok) throw new Error('Helius RPC failed');
+    const j = await res.json();
+    if(j?.error) throw new Error(j.error?.message || 'Helius RPC error');
+    return j.result;
+}
+
+function computeRiskScore({ liquidityUsd, ageHours }){
+    let risk = 0;
+    const reasons = [];
+    if(liquidityUsd !== null && liquidityUsd < 20000){ risk += 20; reasons.push('Low liquidity'); }
+    if(liquidityUsd !== null && liquidityUsd < 5000){ risk += 20; reasons.push('Very low liquidity'); }
+    if(ageHours !== null && ageHours < 2){ risk += 10; reasons.push('Very new launch'); }
+    if(ageHours !== null && ageHours < 0.5){ risk += 10; reasons.push('Fresh launch'); }
+    risk = Math.max(0, Math.min(100, risk));
+    let label = 'Low';
+    if(risk >= 60) label = 'High';
+    else if(risk >= 30) label = 'Medium';
+    return { risk, label, reasons };
+}
+
+function showGemPanel(){
+    const panel = document.getElementById('gemAnalysisPanel');
+    if(panel) panel.style.display = 'block';
+    }
+
+function setGemLoading(on, msg){
+    const l = document.getElementById('gemAnalysisLoading');
+    const b = document.getElementById('gemAnalysisBody');
+    const e = document.getElementById('gemAnalysisError');
+    if(l){ l.style.display = on ? 'block' : 'none'; if(msg) l.textContent = msg; }
+    if(b) b.style.display = on ? 'none' : 'block';
+    if(e) e.style.display = 'none';
+}
+function setGemError(message){
+    const l = document.getElementById('gemAnalysisLoading');
+    const b = document.getElementById('gemAnalysisBody');
+    const e = document.getElementById('gemAnalysisError');
+    if(l) l.style.display = 'none';
+    if(b) b.style.display = 'none';
+    if(e){ e.style.display = 'block'; e.textContent = message || 'Error'; }
+}
+
+// ===== Trader Engine (Momentum + Volatility) - v19 =====
+function buildTraderSuggestion({ priceUsd, change24h, liquidityUsd, volume24h, ageHours }){
+    const price = (priceUsd !== null && priceUsd !== undefined) ? Number(priceUsd) : null;
+    const ch = (change24h !== null && change24h !== undefined) ? Number(change24h) : null;
+    const liq = (liquidityUsd !== null && liquidityUsd !== undefined) ? Number(liquidityUsd) : null;
+    const vol = (volume24h !== null && volume24h !== undefined) ? Number(volume24h) : null;
+
+    // Momentum bucket (RSI-like proxy using 24h change)
+    let momentum = 'Neutral';
+    if(ch !== null && isFinite(ch)){
+        if(ch <= -20) momentum = 'Oversold';
+        else if(ch >= 25) momentum = 'Overbought';
+        else if(ch >= 10) momentum = 'Hot';
+        else if(ch <= -10) momentum = 'Weak';
+    }
+
+    // Volatility / quality bucket (mainly liquidity-based)
+    let volatility = 'Medium';
+    if(liq !== null && isFinite(liq)){
+        if(liq < 20000) volatility = 'High';
+        else if(liq < 60000) volatility = 'Medium';
+        else volatility = 'Low';
+    }
+
+    // Suggested levels (simple, keys-free MVP)
+    let entry = '—', stop = '—', tp = '—';
+    if(price !== null && isFinite(price) && price > 0){
+        let entryLo, entryHi, stopP, tp1, tp2;
+
+        if(momentum === 'Oversold'){
+            entryLo = price * 0.97; entryHi = price * 1.02;
+            stopP = price * 0.88;
+            tp1 = price * 1.25; tp2 = price * 1.60;
+        } else if(momentum === 'Weak'){
+            entryLo = price * 0.98; entryHi = price * 1.02;
+            stopP = price * 0.90;
+            tp1 = price * 1.18; tp2 = price * 1.45;
+        } else if(momentum === 'Overbought'){
+            // Prefer pullback entries
+            entryLo = price * 0.90; entryHi = price * 0.95;
+            stopP = price * 0.85;
+            tp1 = price * 1.10; tp2 = price * 1.30;
+        } else if(momentum === 'Hot'){
+            entryLo = price * 0.96; entryHi = price * 1.00;
+            stopP = price * 0.88;
+            tp1 = price * 1.20; tp2 = price * 1.50;
+        } else {
+            entryLo = price * 0.99; entryHi = price * 1.01;
+            stopP = price * 0.92;
+            tp1 = price * 1.15; tp2 = price * 1.35;
+        }
+
+        // Widen for very low liquidity (higher slippage / wicks)
+        if(volatility === 'High'){
+            stopP = price * 0.82;
+            tp2 = Math.max(tp2, price * 1.80);
+        }
+
+        entry = `${formatUsd(entryLo)} – ${formatUsd(entryHi)}`;
+        const stopPct = ((stopP / price - 1) * 100);
+        stop = `${formatUsd(stopP)} (${stopPct.toFixed(1)}%)`;
+        tp = `${formatUsd(tp1)} / ${formatUsd(tp2)}`;
+    }
+
+    const headline = `${momentum} • Volatility ${volatility}`;
+
+    let summary = '';
+    if(momentum === 'Oversold'){
+        summary = 'Pullback already happened. Look for a reclaim + volume pickup before sizing up.';
+    } else if(momentum === 'Overbought'){
+        summary = 'Extended move. Prefer waiting for a pullback to the suggested zone instead of chasing.';
+    } else if(momentum === 'Hot'){
+        summary = 'Strong momentum. Consider smaller size unless liquidity is healthy.';
+    } else if(momentum === 'Weak'){
+        summary = 'Weak momentum. Wait for confirmation or liquidity improvement.';
+    } else {
+        summary = 'Neutral momentum. Use the entry zone and keep risk tight.';
+    }
+
+    // Optional context line
+    const ctxParts = [];
+    if(ch !== null && isFinite(ch)) ctxParts.push(`${ch.toFixed(1)}% (24h)`);
+    if(liq !== null && isFinite(liq)) ctxParts.push(`Liq ${formatCompact(liq)}`);
+    if(vol !== null && isFinite(vol)) ctxParts.push(`Vol ${formatCompact(vol)}`);
+    if(ageHours !== null && isFinite(ageHours)) ctxParts.push(`Age ${ageHours.toFixed(1)}h`);
+    if(ctxParts.length) summary += ` (${ctxParts.join(' • ')})`;
+
+    const momBadge = `Momentum: ${momentum}${(ch !== null && isFinite(ch)) ? ` (${ch.toFixed(1)}%)` : ''}`;
+    const volBadge = `Volatility: ${volatility}${(liq !== null && isFinite(liq)) ? ` (Liq ${formatCompact(liq)})` : ''}`;
+
+    return {
+        headline,
+        summary,
+        // reuse existing badge slots to avoid HTML changes
+        rsiBadge: momBadge,
+        bbBadge: volBadge,
+        entry,
+        stop,
+        tp
+    };
+}
+
+function renderTaToGemPanel(s){
+    const h = document.getElementById('gemTAHeadline');
+    const sum = document.getElementById('gemTASummary');
+    const rsiB = document.getElementById('gemRSIBadge');
+    const bbB = document.getElementById('gemBBBadge');
+    const entry = document.getElementById('gemEntryZone');
+    const stop = document.getElementById('gemStop');
+    const tp = document.getElementById('gemTP');
+    if(h) h.textContent = s.headline || '—';
+    if(sum) sum.textContent = s.summary || '';
+    if(rsiB) rsiB.textContent = s.rsiBadge || 'Momentum: —';
+    if(bbB) bbB.textContent = s.bbBadge || 'Volatility: —';
+    if(entry) entry.textContent = s.entry || '—';
+    if(stop) stop.textContent = s.stop || '—';
+    if(tp) tp.textContent = s.tp || '—';
+}
+// ===== End TA =====
+
+async function analyzeGemHunt(){
+    const contractEl = document.getElementById('gemContract');
+    const stickerEl = document.getElementById('gemSticker');
+    const mint = (contractEl?.value || '').trim();
+    showGemPanel();
+
+    if(!isLikelySolanaAddress(mint)){
+        setGemError('Please enter a valid Solana contract address.');
+        contractEl?.focus();
+        return;
+    }
+
+    setGemLoading(true, 'Fetching pools from DexScreener…');
+
+    try{
+        const pairs = await dexPairsForTokenSolana(mint);
+        const best = pickBestPair(pairs);
+        if(!best){
+            setGemError('No pools found on DexScreener for this token.');
+            return;
+        }
+
+        const base = best.baseToken || {};
+        const quote = best.quoteToken || {};
+
+        const priceUsd = (best.priceUsd !== undefined && best.priceUsd !== null) ? Number(best.priceUsd) : null;
+        const liquidityUsd = (best?.liquidity?.usd !== undefined && best?.liquidity?.usd !== null) ? Number(best.liquidity.usd) : null;
+        const mcap = (best.marketCap !== undefined && best.marketCap !== null) ? Number(best.marketCap) : null;
+        const fdv = (best.fdv !== undefined && best.fdv !== null) ? Number(best.fdv) : null;
+        const vol24 = (best?.volume?.h24 !== undefined && best?.volume?.h24 !== null) ? Number(best.volume.h24) : null;
+
+        const createdAt = best.pairCreatedAt ? Number(best.pairCreatedAt) : null;
+        const ageHours = createdAt ? ((Date.now() - createdAt) / 3600000) : null;
+
+        // --- Fill UI metrics ---
+        const titleEl = document.getElementById('gemTokenTitle');
+        const metaEl = document.getElementById('gemPairMeta');
+        const priceEl = document.getElementById('gemPriceUsd');
+        const liqEl = document.getElementById('gemLiquidityUsd');
+        const mcapEl = document.getElementById('gemMcap');
+        const volEl = document.getElementById('gemVol24');
+        const dexLink = document.getElementById('gemDexLink');
+
+        const sym = base.symbol ? ('$' + base.symbol) : 'Token';
+        if(titleEl) titleEl.textContent = base.name ? `${sym} (${base.name})` : sym;
+
+        const dexName = best.dexId ? String(best.dexId).toUpperCase() : 'DEX';
+        const quoteSym = quote.symbol || 'SOL';
+        const ageTxt = (ageHours !== null && isFinite(ageHours)) ? `${ageHours.toFixed(1)}h` : '—';
+        if(metaEl) metaEl.textContent = `${dexName} · ${quoteSym} · age ${ageTxt}`;
+
+        if(priceEl) priceEl.textContent = (priceUsd !== null && isFinite(priceUsd)) ? formatUsd(priceUsd) : '—';
+        if(liqEl) liqEl.textContent = (liquidityUsd !== null && isFinite(liquidityUsd)) ? '$' + formatCompact(liquidityUsd) : '—';
+
+        if(mcapEl){
+            if((mcap !== null && isFinite(mcap)) && (fdv !== null && isFinite(fdv))){
+                mcapEl.textContent = `MC $${formatCompact(mcap)} / FDV $${formatCompact(fdv)}`;
+            } else if(mcap !== null && isFinite(mcap)){
+                mcapEl.textContent = `MC $${formatCompact(mcap)}`;
+            } else if(fdv !== null && isFinite(fdv)){
+                mcapEl.textContent = `FDV $${formatCompact(fdv)}`;
+            } else {
+                mcapEl.textContent = '—';
+            }
+        }
+
+        if(volEl) volEl.textContent = (vol24 !== null && isFinite(vol24)) ? '$' + formatCompact(vol24) : '—';
+
+        const url = best.url || (best.pairAddress ? `https://dexscreener.com/solana/${best.pairAddress}` : null);
+        if(dexLink && url){
+            dexLink.href = url;
+            dexLink.style.pointerEvents = 'auto';
+            dexLink.style.opacity = '1';
+        }
+
+        // --- Risk score (MVP) ---
+        const risk = computeRiskScore({ liquidityUsd, ageHours });
+        const riskEl = document.getElementById('gemRisk');
+        const riskExplain = document.getElementById('gemRiskExplain');
+        const dot = (risk.label === 'High') ? '🔴' : (risk.label === 'Medium') ? '🟡' : '🟢';
+        if(riskEl) riskEl.textContent = `${dot} ${risk.label} (${risk.risk}/100)`;
+        if(riskExplain){
+            riskExplain.textContent = (risk.reasons && risk.reasons.length)
+                ? risk.reasons.join(' • ')
+                : 'No obvious red flags from liquidity/age.';
+        }
+
+        // --- Trader Engine (keys-free) ---
+        const change24h = best?.priceChange?.h24 ?? null;
+        const sug = buildTraderSuggestion({
+            priceUsd,
+            change24h,
+            liquidityUsd,
+            volume24h: vol24,
+            ageHours
+        });
+        renderTaToGemPanel(sug);
+
+        // Cache analysis for "Post analysis"
+        lastGemAnalysis = {
+            mint,
+            sticker: (stickerEl?.value || '').trim(),
+            base,
+            quote,
+            pair: {
+                dexId: best.dexId || null,
+                pairAddress: best.pairAddress || null,
+                url: url || null
+            },
+            priceUsd,
+            liquidityUsd,
+            marketCap: mcap,
+            fdv,
+            volume24h: vol24,
+            ageHours,
+            risk,
+            ta: { suggestion: sug }
+        };
+
+        openGemHuntPanel();
+    }catch(err){
+        console.error('analyzeGemHunt error:', err);
+        setGemError('Analysis failed. Try again, or check the contract address.');
+    }finally{
+        setGemLoading(false);
+    }
+}
+
+
+function postGemAnalysisToFeed(){
+    if(!currentUser){
+        showToast('Please login first.');
+        return;
+    }
+    if(!lastGemAnalysis){
+        showToast('Run Analyze first.');
+        return;
+    }
+    const a = lastGemAnalysis;
+    const stickerRaw = a.sticker ? (a.sticker.startsWith('$') ? a.sticker : ('$'+a.sticker)) : (a.base?.symbol ? ('$'+a.base.symbol) : '$TOKEN');
+    const riskLine = `${a.risk?.label || '—'} (${a.risk?.risk ?? '—'}/100)`;
+
+    // TA summary (best-effort)
+    const taHead = a.ta?.suggestion?.headline || 'TA unavailable';
+    const taEntry = a.ta?.suggestion?.entry || '—';
+    const taStop = a.ta?.suggestion?.stop || '—';
+    const taTP = a.ta?.suggestion?.tp || '—';
+    const taRSI = (a.ta?.rsi === null || a.ta?.rsi === undefined) ? '—' : a.ta.rsi.toFixed(1);
+
+    const text =
+`🧭 GEM ANALYSIS
+${stickerRaw}
+CA: ${a.mint}
+Price: ${formatUsd(a.priceUsd)}
+Liq: ${formatUsd(a.liquidityUsd)}
+Mcap/FDV: ${a.mcap ? ('$'+formatCompact(a.mcap)) : (a.fdv ? ('$'+formatCompact(a.fdv)+' FDV') : '—')}
+Vol(24h): $${formatCompact(a.vol24 || 0)}
+Risk: ${riskLine}
+
+📉 RSI/BB:
+Signal: ${taHead}
+RSI: ${taRSI}
+Entry: ${taEntry}
+Stop: ${taStop}
+TP: ${taTP}
+
+#GEMHUNT`;
+
+    const textarea = document.getElementById('postTextarea');
+    if(textarea) textarea.value = text;
+    createPost();
+}
+/* --- End Gem Hunt: Analysis Engine --- */
+
 
 </script>
 
