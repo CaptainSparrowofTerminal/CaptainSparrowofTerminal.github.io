@@ -1654,6 +1654,44 @@
 .risk-badge.medium{ border-color: rgba(255,215,0,0.35); color: rgba(255,215,0,0.95); background: rgba(255,215,0,0.07); }
 .risk-badge.high{ border-color: rgba(255,51,102,0.45); color: rgba(255,51,102,0.98); background: rgba(255,51,102,0.08); }
 
+.whale-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-left:8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+  color: rgba(255,255,255,0.85);
+  font-weight: 900;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.whale-badge.quiet{ border-color: rgba(255,255,255,0.14); color: rgba(255,255,255,0.70); background: rgba(255,255,255,0.04); }
+.whale-badge.light{ border-color: rgba(92,255,178,0.18); color: rgba(92,255,178,0.92); background: rgba(92,255,178,0.06); }
+.whale-badge.active{ border-color: rgba(0,214,255,0.22); color: rgba(0,214,255,0.92); background: rgba(0,214,255,0.06); }
+.whale-badge.hot{ border-color: rgba(255,0,128,0.30); color: rgba(255,0,128,0.98); background: rgba(255,0,128,0.07); }
+
+.pump-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-left:8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+  color: rgba(255,255,255,0.85);
+  font-weight: 900;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.pump-badge.none{ border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.70); background: rgba(255,255,255,0.04); }
+.pump-badge.watch{ border-color: rgba(255,215,0,0.28); color: rgba(255,215,0,0.95); background: rgba(255,215,0,0.07); }
+.pump-badge.breakout{ border-color: rgba(20,241,149,0.35); color: rgba(20,241,149,0.98); background: rgba(20,241,149,0.08); }
+.pump-badge.dump{ border-color: rgba(255,51,102,0.45); color: rgba(255,51,102,0.98); background: rgba(255,51,102,0.08); }
+
 
 /* ===== Gem Hunt overflow + long text safety (v17) ===== */
 #gemAnalysisPanel, #gemAnalysisPanel * { min-width: 0; }
@@ -1667,6 +1705,90 @@
 /* === v19: Gem Hunt overflow hardening (mobile) === */
 .gemhunt-card { overflow: hidden; }
 .gemhunt-card * { overflow-wrap: anywhere; word-break: break-word; }
+
+
+/* === CA Hover Tooltip (v21) === */
+.ca-tooltip{
+  position: fixed;
+  z-index: 10050;
+  display:none;
+  max-width: min(360px, calc(100vw - 24px));
+  background: rgba(10, 14, 39, 0.96);
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 34px rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+  pointer-events:none;
+}
+.ca-tooltip .t-title{
+  font-weight: 900;
+  color: var(--primary-gold);
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  overflow-wrap:anywhere;
+}
+.ca-tooltip .t-row{
+  display:flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.85rem;
+  opacity: 0.95;
+}
+.ca-tooltip .t-row span{ opacity: 0.8; }
+.ca-tooltip .t-badges{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.ca-tooltip .t-badge{
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  font-size: 0.78rem;
+  opacity: 0.95;
+}
+.ca-tooltip .t-foot{
+  margin-top: 8px;
+  font-size: 0.78rem;
+  opacity: 0.65;
+  overflow-wrap:anywhere;
+}
+.contract-address{
+  cursor: help;
+  text-decoration: underline;
+  text-decoration-color: rgba(212,175,55,0.35);
+  text-underline-offset: 3px;
+}
+
+/* === Gem Hunt Chart Embed (v21) === */
+#gemChartWrap{
+  margin-top: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+#gemChartHeader{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+#gemChartIframe{
+  width: 100%;
+  height: 360px;
+  border: 0;
+  display:block;
+  background: rgba(0,0,0,0.25);
+}
+@media (max-width: 520px){
+  #gemChartIframe{ height: 320px; }
+}
 
 </style>
 </head>
@@ -2263,6 +2385,9 @@
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
         <div style="padding:6px 8px; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); font-size:.78rem; opacity:.9;" id="gemRSIBadge">RSI: —</div>
         <div style="padding:6px 8px; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); font-size:.78rem; opacity:.9;" id="gemBBBadge">BB: —</div>
+    
+        <div style="padding:6px 8px; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); font-size:.78rem; opacity:.9;" id="gemWhaleBadge">Whale: —</div>
+        <div style="padding:6px 8px; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); font-size:.78rem; opacity:.9;" id="gemPumpBadge">Pump: —</div>
     </div>
     <div style="margin-top:10px; font-size:.80rem; opacity:.85; line-height:1.15rem;">
         <div><b>Entry Zone:</b> <span id="gemEntryZone">—</span></div>
@@ -2278,8 +2403,20 @@
 
                             <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
                                 <a id="gemDexLink" target="_blank" class="gemhunt-btn" style="flex:1; text-decoration:none; text-align:center; padding:10px 12px; background: rgba(255,255,255,.07); color: rgba(255,255,255,.92);">Open DexScreener</a>
+                                <button id="gemChartBtn" class="gemhunt-btn" style="flex:1; text-decoration:none; text-align:center; padding:10px 12px; background: rgba(20,255,149,.10); color: rgba(20,255,149,.95); border: 1px solid rgba(20,255,149,.25);" onclick="toggleGemChart()">Chart</button>
                                 <button class="gemhunt-btn" style="flex:1; padding:10px 12px;" onclick="postGemAnalysisToFeed()">Post analysis</button>
                             </div>
+                            <div id="gemChartWrap" style="display:none;">
+                                <div id="gemChartHeader">
+                                    <div style="font-size:.82rem; opacity:.75;">📊 DexScreener Chart</div>
+                                    <div style="display:flex; gap:10px; align-items:center;">
+                                        <span style="font-size:.78rem; opacity:.65;" id="gemChartMeta"></span>
+                                        <button class="gemhunt-btn" style="padding:8px 10px; width:auto; background: rgba(255,255,255,.07); color: rgba(255,255,255,.92);" onclick="toggleGemChart()">Hide</button>
+                                    </div>
+                                </div>
+                                <iframe id="gemChartIframe" title="DexScreener chart" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                            </div>
+
 
                             </div>
                     </div>
@@ -3174,7 +3311,7 @@ currentUser = null;
                                 </div>
                                 <div style="margin-top: 8px; font-size:0.9rem; color: rgba(224,224,224,0.75);">
                                     Mentions: <b style="color: var(--text-white);">${it.count}</b>
-                                    <span style="opacity:0.7;">· last mentioned ${ago}</span> <span class="risk-badge" data-ca="${it.ca}">Risk: —</span>
+                                    <span style="opacity:0.7;">· last mentioned ${ago}</span> <span class="risk-badge" data-ca="${it.ca}">Risk: —</span><span class="whale-badge quiet" data-ca="${it.ca}">Whale: —</span><span class="pump-badge none" data-ca="${it.ca}">Pump: —</span>
                                 </div>
                             </div>
                             <button class="post-button" style="padding: 10px 16px; border-radius: 14px;" onclick="prefillComposerWithCA('${it.ca}')">Post</button>
@@ -3246,13 +3383,22 @@ currentUser = null;
                     name: analysis.base?.name || null,
                     priceUsd: analysis.priceUsd ?? null,
                     liquidityUsd: analysis.liquidityUsd ?? null,
-                    mcap: analysis.mcap ?? null,
-                    fdv: analysis.fdv ?? null,
-                    vol24: analysis.vol24 ?? null,
-                    top10Pct: analysis.top10Pct ?? null,
+                    mcap: (analysis.marketCap ?? analysis.mcap ?? null),
+                    fdv: (analysis.fdv ?? null),
+                    vol24: (analysis.volume24h ?? analysis.vol24 ?? null),
                     risk: analysis.risk?.risk ?? null,
                     riskLabel: analysis.risk?.label ?? null,
-                    dexUrl: analysis.dexUrl ?? null
+                    dexUrl: (analysis.pair?.url ?? analysis.dexUrl ?? null),
+
+                    // Whale + Pump
+                    whaleScore: analysis.whale?.score ?? null,
+                    whaleLabel: analysis.whale?.label ?? null,
+                    whaleClass: analysis.whale?.cls ?? null,
+                    pumpBadge: analysis.pump?.badge ?? null,
+                    pumpClass: analysis.pump?.cls ?? null,
+                    pumpPc5: analysis.pump?.pc5 ?? null,
+                    pumpPc15: analysis.pump?.pc15 ?? null,
+                    pumpPc1h: analysis.pump?.pc1h ?? null
                 };
                 await window.firebaseSet(window.firebaseRef(window.firebaseDB, `analysisCache/${analysis.mint}`), payload);
             }catch(e){
@@ -3263,11 +3409,14 @@ currentUser = null;
         window.__compassHydrateTrendingBadges = async function(root){
             try{
                 const scope = root || document;
-                const badges = Array.from(scope.querySelectorAll('.risk-badge[data-ca]'));
-                if(!badges.length || !window.firebaseReady) return;
+                const riskBadges = Array.from(scope.querySelectorAll('.risk-badge[data-ca]'));
+                const whaleBadges = Array.from(scope.querySelectorAll('.whale-badge[data-ca]'));
+                const pumpBadges = Array.from(scope.querySelectorAll('.pump-badge[data-ca]'));
+                const all = [...riskBadges, ...whaleBadges, ...pumpBadges];
+                if(!all.length || !window.firebaseReady) return;
 
                 // de-dupe CAs
-                const cas = Array.from(new Set(badges.map(b=> (b.getAttribute('data-ca')||'').trim()).filter(Boolean)));
+                const cas = Array.from(new Set(all.map(b=> (b.getAttribute('data-ca')||'').trim()).filter(Boolean)));
                 const cache = new Map();
 
                 await Promise.all(cas.map(async (ca)=>{
@@ -3277,7 +3426,7 @@ currentUser = null;
                     }catch(e){}
                 }));
 
-                badges.forEach(b=>{
+                riskBadges.forEach(b=>{
                     const ca = (b.getAttribute('data-ca')||'').trim();
                     const v = cache.get(ca);
                     if(!v || v.risk == null || !v.riskLabel){
@@ -3291,6 +3440,26 @@ currentUser = null;
                     b.classList.remove('low','medium','high');
                     b.classList.add(label === 'High' ? 'high' : (label === 'Medium' ? 'medium' : 'low'));
                 });
+
+                whaleBadges.forEach(b=>{
+                    const ca = (b.getAttribute('data-ca')||'').trim();
+                    const v = cache.get(ca);
+                    const text = v?.whaleScore != null ? `🐋 Whale: ${v.whaleScore}/100 · ${(v.whaleLabel || '—')}` : 'Whale: —';
+                    b.textContent = text;
+                    b.classList.remove('quiet','light','active','hot');
+                    if(v?.whaleClass) b.classList.add(String(v.whaleClass));
+                    else b.classList.add('quiet');
+                });
+
+                pumpBadges.forEach(b=>{
+                    const ca = (b.getAttribute('data-ca')||'').trim();
+                    const v = cache.get(ca);
+                    b.textContent = v?.pumpBadge ? String(v.pumpBadge) : 'Pump: —';
+                    b.classList.remove('none','watch','breakout','dump');
+                    if(v?.pumpClass) b.classList.add(String(v.pumpClass));
+                    else b.classList.add('none');
+                });
+
             }catch(e){
                 console.warn('hydrate trending badges failed:', e);
             }
@@ -6404,14 +6573,74 @@ function buildTraderSuggestion({ priceUsd, change24h, liquidityUsd, volume24h, a
     };
 }
 
+
+function _clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+function computeWhalePump(pair){
+    const liq = Number(pair?.liquidity?.usd || 0);
+    const vol24 = Number(pair?.volume?.h24 || 0);
+    const tx24 = Number((pair?.txns?.h24?.buys || 0) + (pair?.txns?.h24?.sells || 0));
+    const ratio = (liq > 0) ? (vol24 / liq) : 0;
+
+    // Whale score: mix of absolute activity + intensity (vol/liquidity) + tx count
+    const raw = (Math.log10(vol24 + 1) * 18) + (Math.log10(liq + 1) * 12) + (ratio * 10) + (Math.log10(tx24 + 1) * 14);
+    const score = _clamp(raw, 0, 100);
+
+    let whaleClass = 'quiet';
+    let whaleLabel = 'Quiet';
+    if(score >= 75){ whaleClass='hot'; whaleLabel='Hot'; }
+    else if(score >= 55){ whaleClass='active'; whaleLabel='Active'; }
+    else if(score >= 35){ whaleClass='light'; whaleLabel='Light'; }
+
+    const whaleBadge = `🐋 Whale: ${Math.round(score)}/100 · ${whaleLabel}`;
+
+    // Pump detector: uses short-term priceChange + txns when available
+    const pc5 = Number(pair?.priceChange?.m5 ?? 0);
+    const pc15 = Number(pair?.priceChange?.m15 ?? 0);
+    const pc1h = Number(pair?.priceChange?.h1 ?? 0);
+
+    const tx5 = Number((pair?.txns?.m5?.buys || 0) + (pair?.txns?.m5?.sells || 0));
+    const tx15 = Number((pair?.txns?.m15?.buys || 0) + (pair?.txns?.m15?.sells || 0));
+
+    let pumpClass = 'none';
+    let pumpBadge = 'Pump: —';
+
+    // Breakout rules (MVP)
+    if(pc5 >= 6 && (tx5 >= 10 || tx15 >= 25)){
+        pumpClass = 'breakout';
+        pumpBadge = `🚀 Breakout: +${pc5.toFixed(1)}% / 5m`;
+    } else if(pc15 >= 14 && (tx15 >= 25 || liq >= 50000)){
+        pumpClass = 'breakout';
+        pumpBadge = `🚀 Pumping: +${pc15.toFixed(1)}% / 15m`;
+    } else if(pc1h >= 25){
+        pumpClass = 'watch';
+        pumpBadge = `⚡ Hot: +${pc1h.toFixed(1)}% / 1h`;
+    } else if(pc5 <= -6 || pc15 <= -12){
+        pumpClass = 'dump';
+        const drop = Math.min(pc5, pc15);
+        pumpBadge = `🧊 Dump: ${drop.toFixed(1)}%`;
+    } else if(pc15 >= 7 || pc5 >= 3){
+        pumpClass = 'watch';
+        pumpBadge = `👀 Watch: +${Math.max(pc5, pc15).toFixed(1)}%`;
+    }
+
+    return {
+        whale: { score: Math.round(score), label: whaleLabel, cls: whaleClass, badge: whaleBadge, ratio },
+        pump: { cls: pumpClass, badge: pumpBadge, pc5, pc15, pc1h }
+    };
+}
+
 function renderTaToGemPanel(s){
     const h = document.getElementById('gemTAHeadline');
     const sum = document.getElementById('gemTASummary');
     const rsiB = document.getElementById('gemRSIBadge');
     const bbB = document.getElementById('gemBBBadge');
+    const whaleB = document.getElementById('gemWhaleBadge');
+    const pumpB = document.getElementById('gemPumpBadge');
     const entry = document.getElementById('gemEntryZone');
     const stop = document.getElementById('gemStop');
     const tp = document.getElementById('gemTP');
+
     if(h) h.textContent = s.headline || '—';
     if(sum) sum.textContent = s.summary || '';
     if(rsiB) rsiB.textContent = s.rsiBadge || 'Momentum: —';
@@ -6419,6 +6648,17 @@ function renderTaToGemPanel(s){
     if(entry) entry.textContent = s.entry || '—';
     if(stop) stop.textContent = s.stop || '—';
     if(tp) tp.textContent = s.tp || '—';
+
+    if(whaleB){
+        whaleB.textContent = s.whaleBadge || 'Whale: —';
+        whaleB.classList.remove('quiet','light','active','hot');
+        if(s.whaleClass) whaleB.classList.add(String(s.whaleClass));
+    }
+    if(pumpB){
+        pumpB.textContent = s.pumpBadge || 'Pump: —';
+        pumpB.classList.remove('none','watch','breakout','dump');
+        if(s.pumpClass) pumpB.classList.add(String(s.pumpClass));
+    }
 }
 // ===== End TA =====
 
@@ -6496,6 +6736,32 @@ async function analyzeGemHunt(){
             dexLink.style.pointerEvents = 'auto';
             dexLink.style.opacity = '1';
         }
+        // --- Chart embed (DexScreener) ---
+        try{
+            const wrap = document.getElementById('gemChartWrap');
+            const iframe = document.getElementById('gemChartIframe');
+            const meta = document.getElementById('gemChartMeta');
+            if(wrap && iframe){
+                let embedUrl = null;
+                if(best && best.chainId && String(best.chainId).toLowerCase() === 'solana' && best.pairAddress){
+                    embedUrl = `https://dexscreener.com/solana/${best.pairAddress}?embed=1&theme=dark`;
+                } else if(url){
+                    embedUrl = (url.indexOf('?') >= 0) ? (url + '&embed=1&theme=dark') : (url + '?embed=1&theme=dark');
+                }
+                if(embedUrl){
+                    iframe.src = embedUrl;
+                    if(meta){
+                        const ps = (base && base.symbol) ? ('$' + base.symbol) : '';
+                        meta.textContent = ps ? `${ps} · ${quoteSym}` : `${quoteSym}`;
+                    }
+                    // keep collapsed by default
+                    wrap.style.display = 'none';
+                    const btn = document.getElementById('gemChartBtn');
+                    if(btn) btn.style.display = 'inline-flex';
+                }
+            }
+        }catch(e){}
+
 
         // --- Risk score (MVP) ---
         const risk = computeRiskScore({ liquidityUsd, ageHours });
@@ -6518,6 +6784,14 @@ async function analyzeGemHunt(){
             volume24h: vol24,
             ageHours
         });
+
+        // Whale score + Pump detector (keys-free)
+        const wp = computeWhalePump(best);
+        sug.whaleBadge = wp?.whale?.badge || 'Whale: —';
+        sug.whaleClass = wp?.whale?.cls || 'quiet';
+        sug.pumpBadge  = wp?.pump?.badge || 'Pump: —';
+        sug.pumpClass  = wp?.pump?.cls || 'none';
+
         renderTaToGemPanel(sug);
 
         // Cache analysis for "Post analysis"
@@ -6538,8 +6812,14 @@ async function analyzeGemHunt(){
             volume24h: vol24,
             ageHours,
             risk,
-            ta: { suggestion: sug }
+            ta: { suggestion: sug },
+            whale: wp?.whale || null,
+            pump: wp?.pump || null
         };
+
+        // Cache for Trending badges
+        try{ if(typeof cacheGemAnalysisToFirebase === 'function') await cacheGemAnalysisToFirebase(lastGemAnalysis); }catch(e){}
+
 
         openGemHuntPanel();
     }catch(err){
@@ -6550,6 +6830,17 @@ async function analyzeGemHunt(){
     }
 }
 
+
+
+function toggleGemChart(force){
+    const wrap = document.getElementById('gemChartWrap');
+    const iframe = document.getElementById('gemChartIframe');
+    if(!wrap || !iframe) return;
+    const show = (force === true) ? true : (force === false) ? false : (wrap.style.display === 'none' || !wrap.style.display);
+    wrap.style.display = show ? 'block' : 'none';
+    const btn = document.getElementById('gemChartBtn');
+    if(btn) btn.textContent = show ? 'Hide Chart' : 'Chart';
+}
 
 function postGemAnalysisToFeed(){
     if(!currentUser){
@@ -6626,13 +6917,174 @@ TP: ${taTP}
     return s.slice(0,6) + "..." + s.slice(-4);
   }
 
-  function hydrateCAs(root){
+  
+  // === CA Hover Tooltip (v21) ===
+  var __caTooltip = null;
+  var __caQuickCache = {};
+  var __caTooltipHideT = null;
+
+  function ensureTooltip(){
+    if(__caTooltip) return __caTooltip;
+    __caTooltip = document.getElementById('caTooltip');
+    return __caTooltip;
+  }
+
+  function fmtUsd(v){
+    if(v === null || v === undefined || !isFinite(v)) return '—';
+    var n = Number(v);
+    if(n >= 1000000000) return '$' + (n/1e9).toFixed(2) + 'B';
+    if(n >= 1000000) return '$' + (n/1e6).toFixed(2) + 'M';
+    if(n >= 1000) return '$' + (n/1e3).toFixed(2) + 'K';
+    if(n >= 1) return '$' + n.toFixed(4);
+    return '$' + n.toFixed(8);
+  }
+
+  function safeText(s){ return (s===null || s===undefined) ? '' : String(s); }
+
+  async function getQuickData(ca){
+    var key = safeText(ca).trim();
+    if(!key) return null;
+    if(__caQuickCache[key]) return __caQuickCache[key];
+
+    // 1) Try Firebase analysis cache first (fast)
+    try{
+      if(window.firebaseReady){
+        var snap = await window.firebaseGet(window.firebaseRef(window.firebaseDB, 'analysisCache/' + key));
+        if(snap && snap.exists && snap.exists()){
+          var v = snap.val();
+          __caQuickCache[key] = v;
+          return v;
+        }
+      }
+    }catch(e){}
+
+    // 2) Fallback to DexScreener token endpoint (public)
+    try{
+      var r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + encodeURIComponent(key));
+      if(!r.ok) throw new Error('dex ' + r.status);
+      var j = await r.json();
+      var pair = (j && j.pairs && j.pairs.length) ? j.pairs[0] : null;
+      if(!pair) return null;
+
+      var risk = (typeof computeRiskScore === 'function')
+        ? computeRiskScore({ liquidityUsd: pair.liquidity && pair.liquidity.usd ? Number(pair.liquidity.usd) : null, ageHours: null })
+        : null;
+      var wp = (typeof computeWhalePump === 'function') ? computeWhalePump(pair) : null;
+
+      var out = {
+        ts: Date.now(),
+        mint: key,
+        symbol: pair.baseToken && pair.baseToken.symbol ? pair.baseToken.symbol : null,
+        name: pair.baseToken && pair.baseToken.name ? pair.baseToken.name : null,
+        priceUsd: pair.priceUsd ? Number(pair.priceUsd) : null,
+        liquidityUsd: pair.liquidity && pair.liquidity.usd ? Number(pair.liquidity.usd) : null,
+        mcap: pair.marketCap ? Number(pair.marketCap) : null,
+        fdv: pair.fdv ? Number(pair.fdv) : null,
+        vol24: pair.volume && pair.volume.h24 ? Number(pair.volume.h24) : null,
+        dexUrl: pair.url || (pair.pairAddress ? ('https://dexscreener.com/solana/' + pair.pairAddress) : null),
+        risk: risk ? risk.risk : null,
+        riskLabel: risk ? risk.label : null,
+        whaleScore: wp && wp.whale ? wp.whale.score : null,
+        whaleLabel: wp && wp.whale ? wp.whale.label : null,
+        pumpBadge: wp && wp.pump ? wp.pump.badge : null
+      };
+      __caQuickCache[key] = out;
+      return out;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function showTooltipAt(x, y){
+    var tip = ensureTooltip();
+    if(!tip) return;
+    tip.style.display = 'block';
+    // measure after display
+    var w = tip.offsetWidth || 320;
+    var h = tip.offsetHeight || 120;
+    tip.style.left = Math.min(x + 14, window.innerWidth - w - 12) + 'px';
+    tip.style.top  = Math.min(y + 14, window.innerHeight - h - 12) + 'px';
+  }
+
+  function renderTooltipLoading(ca){
+    var tip = ensureTooltip();
+    if(!tip) return;
+    tip.innerHTML = '<div class="t-title">' + shortenCA(ca) + '</div><div style="opacity:.75; font-size:.85rem;">Loading…</div>';
+  }
+
+  function renderTooltipData(ca, d){
+    var tip = ensureTooltip();
+    if(!tip) return;
+    if(!d){
+      tip.innerHTML = '<div class="t-title">' + shortenCA(ca) + '</div><div style="opacity:.75; font-size:.85rem;">No data yet. Click Analyze.</div>';
+      return;
+    }
+    var title = (d.symbol ? ('$' + d.symbol) : 'Token') + (d.name ? (' · ' + d.name) : '');
+    var riskDot = (d.riskLabel === 'High') ? '🔴' : (d.riskLabel === 'Medium') ? '🟡' : (d.riskLabel === 'Low') ? '🟢' : '⚪';
+    var riskTxt = d.riskLabel ? (riskDot + ' ' + d.riskLabel + (d.risk !== null && d.risk !== undefined ? (' ('+d.risk+'/100)') : '')) : '—';
+    var whaleTxt = (d.whaleLabel ? ('🐋 ' + d.whaleLabel + (d.whaleScore !== null && d.whaleScore !== undefined ? (' ('+d.whaleScore+'/100)') : '')) : '🐋 —');
+    var pumpTxt = d.pumpBadge ? ('🚀 ' + d.pumpBadge.replace('Pump:','').trim()) : '🚀 —';
+
+    tip.innerHTML = ''
+      + '<div class="t-title">' + title + '</div>'
+      + '<div class="t-row"><span>Price</span><b>' + fmtUsd(d.priceUsd) + '</b></div>'
+      + '<div class="t-row"><span>Liq</span><b>' + fmtUsd(d.liquidityUsd) + '</b></div>'
+      + '<div class="t-row"><span>Vol 24h</span><b>' + fmtUsd(d.vol24) + '</b></div>'
+      + '<div class="t-badges">'
+      +   '<div class="t-badge">' + riskTxt + '</div>'
+      +   '<div class="t-badge">' + whaleTxt + '</div>'
+      +   '<div class="t-badge">' + pumpTxt + '</div>'
+      + '</div>'
+      + '<div class="t-foot">CA: ' + shortenCA(ca) + ' · click Analyze for full panel</div>';
+  }
+
+  function hideTooltipSoon(){
+    var tip = ensureTooltip();
+    if(!tip) return;
+    if(__caTooltipHideT) clearTimeout(__caTooltipHideT);
+    __caTooltipHideT = setTimeout(function(){ tip.style.display = 'none'; }, 120);
+  }
+
+function hydrateCAs(root){
     (root||document).querySelectorAll(".contract-address[data-full]").forEach(function(el){
       var full = el.getAttribute("data-full") || "";
       if(!el.getAttribute("data-hydrated")){
         el.textContent = shortenCA(full);
         el.setAttribute("title", full);
         el.setAttribute("data-hydrated","1");
+      }
+      if(!el.getAttribute("data-tooltip")){
+        el.setAttribute("data-tooltip","1");
+        el.addEventListener("mouseenter", async function(ev){
+          try{
+            if(__caTooltipHideT) clearTimeout(__caTooltipHideT);
+            renderTooltipLoading(full);
+            showTooltipAt(ev.clientX, ev.clientY);
+            var d = await getQuickData(full);
+            renderTooltipData(full, d);
+            showTooltipAt(ev.clientX, ev.clientY);
+          }catch(e){}
+        });
+        el.addEventListener("mousemove", function(ev){
+          try{
+            var tip = ensureTooltip();
+            if(tip && tip.style.display === "block"){
+              showTooltipAt(ev.clientX, ev.clientY);
+            }
+          }catch(e){}
+        });
+        el.addEventListener("mouseleave", function(){
+          hideTooltipSoon();
+        });
+        el.addEventListener("click", function(ev){
+          try{
+            if(window.innerWidth <= 680){
+              ev.preventDefault();
+              ev.stopPropagation();
+              openGemHuntPanelWithCA(full);
+            }
+          }catch(e){}
+        });
       }
     });
   }
@@ -6684,6 +7136,9 @@ TP: ${taTP}
   window.__compassHydrateCAs = hydrateCAs;
 })();
 </script>
+
+
+    <div id="caTooltip" class="ca-tooltip"></div>
 
 </body>
 </html>
