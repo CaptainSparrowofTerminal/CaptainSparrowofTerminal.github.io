@@ -1865,6 +1865,20 @@
                     <span class="nav-text">Trending</span>
                 </li>
 
+<li class="nav-item" onclick="switchPage('radar')">
+    <span class="nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19a7 7 0 0 1 7-7h8"></path>
+            <path d="M4 19a7 7 0 0 0 7-7h8"></path>
+            <circle cx="4" cy="19" r="1"></circle>
+            <circle cx="20" cy="12" r="1"></circle>
+        </svg>
+    </span>
+    <span class="nav-text">Early Radar</span>
+</li>
+
+
+
                 <li class="nav-item" onclick="openGemHuntPanel()">
                     <span class="nav-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2084,7 +2098,32 @@
                 <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="handleProfilePhotoUpload(event)">
             </div>
             
-            <!-- Trending Page -->
+            
+<!-- Early Radar Page -->
+<div id="radarPage" style="display: none;">
+    <div class="feed-header">
+        <h1 class="feed-title">🚨 Early Radar</h1>
+    </div>
+
+    <div style="padding: 14px 18px; opacity: 0.75; line-height: 1.45;">
+        <div style="font-weight: 800; color: var(--primary-gold); margin-bottom: 6px;">Signals before they trend</div>
+        <div style="font-size: 0.9rem;">
+            Built from early <b>volume/liquidity intensity</b>, <b>tx spikes</b>, and <b>low social mentions</b>.
+            Keys-free. Fast. Filtered.
+        </div>
+    </div>
+
+    <div id="radarControls" style="display:flex; gap:10px; padding: 0 18px 14px 18px; align-items:center; flex-wrap:wrap;">
+        <button class="mark-read-btn" onclick="loadEarlyRadar(true)">Refresh</button>
+        <div style="opacity:0.7; font-size:0.85rem;">(Uses your recent mentions + live Dex data)</div>
+    </div>
+
+    <div id="radarCoinsList">
+        <div style="padding: 26px; text-align:center; opacity:0.65;">Loading radar…</div>
+    </div>
+</div>
+
+<!-- Trending Page -->
             <div id="trendingPage" style="display: none;">
                 <div class="feed-header">
                     <h1 class="feed-title">🔥 Trending</h1>
@@ -2543,7 +2582,7 @@
             }
         }
 
-        function hydrateOverlayAvatars() {
+        async function hydrateOverlayAvatars() {
             const imgs = document.querySelectorAll('#notificationsOverlayList img[data-actor-id]');
             const ids = Array.from(new Set(Array.from(imgs).map(img => img.getAttribute('data-actor-id')).filter(Boolean)));
             ids.forEach(async (id) => {
@@ -2794,7 +2833,7 @@ if (n.type === 'like') return `${who} liked your post`;
 
         
         // Wait for Firebase
-        function waitForFirebase() {
+        async function waitForFirebase() {
             return new Promise((resolve) => {
                 const check = setInterval(() => {
                     if (window.firebaseReady) {
@@ -2852,7 +2891,7 @@ if (n.type === 'like') return `${who} liked your post`;
             document.getElementById('authModal').classList.remove('hidden');
         }
         
-        function hideAuthModal() {
+        async function hideAuthModal() {
             document.getElementById('authModal').classList.add('hidden');
         }
         
@@ -3241,7 +3280,196 @@ currentUser = null;
             await Promise.allSettled(writes);
         }
 
-        async function loadTrendingCoins(force = false) {
+        async 
+// ===== Early Radar (keys-free) =====
+let _earlyRadarLastLoaded = 0;
+async function loadEarlyRadar(force = false){
+    const listEl = document.getElementById('radarCoinsList');
+    if(!listEl) return;
+
+    const now = Date.now();
+    if(!force && (now - _earlyRadarLastLoaded) < 15000){
+        return; // debounce
+    }
+    _earlyRadarLastLoaded = now;
+
+    listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.65;">Scanning early signals…</div>';
+
+    // Pull recent mention events (community surface) and look for *low mention* tokens with *rising activity*
+    try{
+        const cutoff = Date.now() - (24 * 60 * 60 * 1000);
+        const evRef = window.firebaseRef(window.firebaseDB, 'mentionEvents');
+        const q = window.firebaseQuery(evRef, window.firebaseOrderByChild('ts'), window.firebaseLimitToLast(2500));
+        const snap = await window.firebaseGet(q);
+
+        const byCA = {};
+        if(snap.exists()){
+            const v = snap.val() || {};
+            for(const k in v){
+                const ev = v[k];
+                const ts = Number(ev?.ts || 0);
+                if(ts < cutoff) continue;
+                const ca = (ev?.ca || '').trim();
+                if(!ca) continue;
+                if(!byCA[ca]) byCA[ca] = { ca, mentions:0, last:0, first:ts };
+                byCA[ca].mentions += 1;
+                byCA[ca].last = Math.max(byCA[ca].last, ts);
+                byCA[ca].first = Math.min(byCA[ca].first, ts);
+            }
+        }
+
+        // Candidate set: low mentions, recent activity
+        const candidates = Object.values(byCA)
+            .filter(x => x.mentions <= 5)
+            .sort((a,b) => b.last - a.last)
+            .slice(0, 40);
+
+        if(candidates.length === 0){
+            listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.65;">No early candidates yet. Post & mention more CAs to seed the radar.</div>';
+            return;
+        }
+
+        // Fetch Dex data for candidates (batched with small concurrency)
+        const results = [];
+        const concurrency = 6;
+        let idx = 0;
+
+        async function worker(){
+            while(idx < candidates.length){
+                const my = candidates[idx++];
+                const ca = my.ca;
+                try{
+                    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(ca)}`);
+                    const d = await r.json();
+                    const pair = (d?.pairs && d.pairs.length) ? d.pairs[0] : null;
+                    if(!pair) continue;
+
+                    const createdAt = Number(pair?.pairCreatedAt || 0);
+                    const ageH = createdAt ? ((Date.now() - createdAt) / (1000*60*60)) : null;
+
+                    const liq = Number(pair?.liquidity?.usd || 0);
+                    const vol24 = Number(pair?.volume?.h24 || 0);
+                    const pc15 = Number(pair?.priceChange?.m15 ?? 0);
+                    const pc5  = Number(pair?.priceChange?.m5  ?? 0);
+                    const pc1h = Number(pair?.priceChange?.h1  ?? 0);
+                    const tx15 = Number((pair?.txns?.m15?.buys||0) + (pair?.txns?.m15?.sells||0));
+                    const tx5  = Number((pair?.txns?.m5?.buys||0) + (pair?.txns?.m5?.sells||0));
+
+                    const wp = computeWhalePump(pair);
+                    // Early score: reward intensity + tx spikes, penalize low liquidity and too many mentions
+                    const intensity = (liq > 0) ? (vol24 / liq) : 0;
+                    const spike = (Math.max(pc5, pc15) * 1.4) + (pc1h * 0.6) + (tx15 * 0.08) + (tx5 * 0.05);
+                    const liqPenalty = liq < 15000 ? 18 : (liq < 30000 ? 8 : 0);
+                    const mentionPenalty = my.mentions * 6;
+                    const agePenalty = (ageH !== null && ageH > 24) ? 10 : 0;
+                    const score = _clamp((wp.score * 0.45) + (spike * 1.6) + (intensity * 8) - liqPenalty - mentionPenalty - agePenalty, 0, 100);
+
+                    // Filter: must be "early-ish"
+                    const earlyEnough = (my.mentions <= 4) && (liq >= 8000) && (tx15 >= 6 || pc15 >= 4 || pc5 >= 3);
+                    if(!earlyEnough) continue;
+
+                    results.push({
+                        ca,
+                        score,
+                        mentions: my.mentions,
+                        last: my.last,
+                        pair,
+                        whale: wp,
+                        pump: wp.pumpLabel,
+                        pumpClass: wp.pumpClass,
+                        whaleLabel: wp.whaleLabel,
+                        whaleClass: wp.whaleClass,
+                        createdAt,
+                        ageH
+                    });
+                }catch(e){
+                    // ignore per-candidate
+                }
+            }
+        }
+
+        await Promise.all(Array.from({length: concurrency}, worker));
+
+        results.sort((a,b) => b.score - a.score);
+
+        if(results.length === 0){
+            listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.65;">No strong early signals right now. Try again in a few minutes.</div>';
+            return;
+        }
+
+        listEl.innerHTML = results.slice(0, 20).map(r => {
+            const pair = r.pair || {};
+            const base = (pair?.baseToken?.symbol || 'TOKEN');
+            const price = Number(pair?.priceUsd || 0);
+            const liq = Number(pair?.liquidity?.usd || 0);
+            const vol24 = Number(pair?.volume?.h24 || 0);
+            const chartUrl = pair?.url || (pair?.dexId ? `https://dexscreener.com/${pair.chainId}/${pair.pairAddress}` : '#');
+            const ageTxt = (r.ageH === null) ? '—' : (r.ageH < 1 ? `${Math.max(1, Math.round(r.ageH*60))}m` : `${r.ageH.toFixed(1)}h`);
+
+            return `
+            <div class="post" style="margin: 10px 16px;">
+                <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+                    <div style="min-width:0;">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <div style="font-weight:900; color: var(--primary-gold); font-size: 1.05rem;">${escapeHtml(base)}</div>
+                            <span class="whale-badge whale-${r.whaleClass}">🐋 ${r.whaleLabel} <b>${Math.round(r.whale.score)}</b></span>
+                            <span class="pump-badge pump-${r.pumpClass}">🚀 ${r.pumpLabel}</span>
+                            <span class="risk-badge risk-medium">👀 Early</span>
+                        </div>
+                        <div style="margin-top:6px; opacity:0.72; font-size:0.9rem; line-height:1.4;">
+                            <span class="contract-address">${r.ca}</span>
+                            <button class="copy-ca" onclick="copyText('${r.ca}')">Copy</button>
+                        </div>
+                        <div style="margin-top:8px; display:flex; gap:14px; flex-wrap:wrap; opacity:0.8; font-size:0.88rem;">
+                            <span>Price: <b>$${isFinite(price)&&price? price.toFixed(price<0.01?6:4):'—'}</b></span>
+                            <span>Liq: <b>$${liq? Math.round(liq).toLocaleString(): '—'}</b></span>
+                            <span>Vol24: <b>$${vol24? Math.round(vol24).toLocaleString(): '—'}</b></span>
+                            <span>Age: <b>${ageTxt}</b></span>
+                            <span>Mentions: <b>${r.mentions}</b></span>
+                            <span>Score: <b>${Math.round(r.score)}/100</b></span>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px; align-items:stretch; min-width: 150px;">
+                        <button class="follow-btn" onclick="openGemHuntWithCA('${r.ca}', true)">Analyze</button>
+                        <button class="logout-btn" style="border-color: rgba(212,175,55,0.45); color: var(--primary-gold);" onclick="openExternal('${chartUrl}')">Chart</button>
+                        <button class="logout-btn" onclick="quickPostRadar('${escapeHtml(base)}','${r.ca}', ${Math.round(r.score)}, '${r.whaleLabel}', '${r.pumpLabel}')">Post</button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+    }catch(e){
+        console.error(e);
+        listEl.innerHTML = '<div style="padding: 26px; text-align:center; opacity:0.65;">Radar unavailable. Try again.</div>';
+    }
+}
+
+function openExternal(url){
+    try{ window.open(url, '_blank', 'noopener'); }catch(e){}
+}
+
+async function quickPostRadar(symbol, ca, score, whaleLabel, pumpLabel){
+    const msg = `🚨 EARLY RADAR\n\n$${symbol}\nCA: ${ca}\nScore: ${score}/100\nWhale: ${whaleLabel}\nPump: ${pumpLabel}\n\nDYOR. Not financial advice.`;
+    try{
+        // open gem hunt and prefill a shareable signal
+        openGemHuntWithCA(ca, false);
+        const ta = document.getElementById('postTextarea');
+        if(ta){ ta.value = msg; }
+        showToast('Prefilled a radar post in composer ✍️');
+        switchPage('home');
+        setTimeout(()=>{ const t=document.getElementById('postTextarea'); if(t) t.focus(); }, 180);
+    }catch(e){
+        try{
+            const ta = document.getElementById('postTextarea');
+            if(ta){ ta.value = msg; showToast('Prefilled a radar post in composer ✍️'); switchPage('home'); }
+        }catch(_){}
+    }
+}
+// ===== End Early Radar =====
+
+
+async function loadTrendingCoins(force = false) {
             // Render trending based on last N mention events within 24h
             const listEl = document.getElementById('trendingCoinsList');
             if (!listEl) return;
@@ -4042,6 +4270,7 @@ async function loadFeed() {
             safeSetDisplay('homePage','none');
             safeSetDisplay('profilePage','none');
             safeSetDisplay('trendingPage','none');
+            safeSetDisplay('radarPage','none');
             safeSetDisplay('searchPage','none');
             safeSetDisplay('notificationsPage','none');
             safeSetDisplay('settingsPage','none');
@@ -4051,24 +4280,38 @@ async function loadFeed() {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
+
+            function _activateNavByPage(p){
+                // Find nav item that calls switchPage('p')
+                const sel = ".nav-item[onclick*=\"switchPage('" + p + "')\"]";
+                const el = document.querySelector(sel);
+                if(el) el.classList.add('active');
+            }
+
             
             // Show selected page and activate nav item
             if (page === 'home') {
                 safeSetDisplay('homePage','block');
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
+                _activateNavByPage('home');
             } else if (page === 'trending') {
                 safeSetDisplay('trendingPage','block');
                 // Load trending coins radar
                 try { loadTrendingCoins(); } catch (e) {}
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-            } else if (page === 'search') {
+                _activateNavByPage('trending');
+            
+} else if (page === 'radar') {
+    safeSetDisplay('radarPage','block');
+    try { loadEarlyRadar(); } catch (e) {}
+    _activateNavByPage('radar');
+
+} else if (page === 'search') {
                 safeSetDisplay('searchPage','block');
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
+                _activateNavByPage('search');
             } else if (page === 'notifications') {
                 safeSetDisplay('notificationsPage','block');
                 const np = document.getElementById('notificationsPage');
                 if (np) { np.style.visibility = 'visible'; np.style.opacity = '1'; np.style.transform = 'none'; }
-                document.querySelectorAll('.nav-item')[3].classList.add('active');
+                _activateNavByPage('notifications');
                 // Render immediately (in case we already have items)
                 renderNotifications();
                 // If the page area is still not visible (layout/CSS issue), use overlay failsafe
@@ -4082,11 +4325,11 @@ async function loadFeed() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else if (page === 'profile') {
                 safeSetDisplay('profilePage','block');
-                document.querySelectorAll('.nav-item')[4].classList.add('active');
+                _activateNavByPage('profile');
                 loadProfile();
             } else if (page === 'settings') {
                 safeSetDisplay('settingsPage','block');
-                document.querySelectorAll('.nav-item')[5].classList.add('active');
+                _activateNavByPage('settings');
             }
         }
         
@@ -4867,7 +5110,7 @@ async function loadFeed() {
             document.getElementById('profilePhotoInput').click();
         }
         
-        function handleBannerUpload(event) {
+        async function handleBannerUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
@@ -4914,7 +5157,7 @@ async function loadFeed() {
             reader.readAsDataURL(file);
         }
         
-        function handleProfilePhotoUpload(event) {
+        async function handleProfilePhotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
@@ -7045,7 +7288,7 @@ TP: ${taTP}
     __caTooltipHideT = setTimeout(function(){ tip.style.display = 'none'; }, 120);
   }
 
-function hydrateCAs(root){
+async function hydrateCAs(root){
     (root||document).querySelectorAll(".contract-address[data-full]").forEach(function(el){
       var full = el.getAttribute("data-full") || "";
       if(!el.getAttribute("data-hydrated")){
