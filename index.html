@@ -6876,7 +6876,6 @@ function shareGemSignal(){
         if(contractEl) contractEl.value = '';
         showToast('Gem Hunt signal posted!');
         try{ closeGemHuntModal(); }catch(e){}
-        openGemHuntPanel();
     } else {
         showToast('Post box not available.');
     }
@@ -7185,7 +7184,7 @@ function renderTaToGemPanel(s){
 }
 // ===== End TA =====
 
-async function analyzeGemHunt(){
+async async function analyzeGemHunt(){
     const contractEl = document.getElementById('gemContract');
     const stickerEl = document.getElementById('gemSticker');
     const mint = (contractEl?.value || '').trim();
