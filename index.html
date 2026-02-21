@@ -37,6 +37,13 @@
         window.firebaseReady = true;
         
         console.log('✅ Firebase initialized');
+    // ---- Global state guards (prevent TDZ / undefined) ----
+    window.currentPostForComment = window.currentPostForComment || null;
+    window.selectedCommentImage = window.selectedCommentImage || null;
+    window.commentsUnsub = window.commentsUnsub || null;
+    window.trendingUnsub = window.trendingUnsub || null;
+    window.infiniteScrollArmed = (typeof window.infiniteScrollArmed === 'boolean') ? window.infiniteScrollArmed : true;
+
     </script>
     
     <style>
@@ -3099,9 +3106,9 @@ if (n.type === 'like') return `${who} liked your post`;
 
         }
         function logout() {
-            try { if (trendingUnsub) { trendingUnsub(); trendingUnsub = null; } } catch(e) {}
+            try { if (window.trendingUnsub) { window.trendingUnsub(); window.trendingUnsub = null; } } catch(e) {}
             try { if (notifUnsub) { notifUnsub(); notifUnsub = null; } } catch(e) {}
-            try { if (commentsUnsub) { commentsUnsub(); commentsUnsub = null; } } catch(e) {}
+            try { if (window.commentsUnsub) { window.commentsUnsub(); window.commentsUnsub = null; } } catch(e) {}
 currentUser = null;
             localStorage.removeItem('compass_user');
             showAuthModal();
@@ -3279,8 +3286,6 @@ currentUser = null;
 
             await Promise.allSettled(writes);
         }
-
-        async 
 // ===== Early Radar (keys-free) =====
 let _earlyRadarLastLoaded = 0;
 async function loadEarlyRadar(force = false){
@@ -4557,8 +4562,8 @@ async function loadFeed() {
         });
         
         // === COMMENT SYSTEM ===
-        let currentPostForComment = null;
-        let selectedCommentImage = null;
+        window.currentPostForComment = null;
+        window.selectedCommentImage = null;
         
         function handleCommentImageSelect(event) {
             const file = event.target.files[0];
@@ -4576,21 +4581,21 @@ async function loadFeed() {
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                selectedCommentImage = e.target.result;
-                document.getElementById('commentPreviewImg').src = selectedCommentImage;
+                window.selectedCommentImage = e.target.result;
+                document.getElementById('commentPreviewImg').src = window.selectedCommentImage;
                 document.getElementById('commentImagePreview').classList.add('active');
             };
             reader.readAsDataURL(file);
         }
         
         function removeCommentImage() {
-            selectedCommentImage = null;
+            window.selectedCommentImage = null;
             document.getElementById('commentImagePreview').classList.remove('active');
             document.getElementById('commentImageInput').value = '';
         }
         
         async function openCommentModal(postId) {
-            currentPostForComment = postId;
+            window.currentPostForComment = postId;
             
             // Get post data
             const postRef = window.firebaseRef(window.firebaseDB, 'posts/' + postId);
@@ -4622,20 +4627,20 @@ async function loadFeed() {
         }
         
         function closeCommentModal() {
-            try { if (commentsUnsub) { commentsUnsub(); commentsUnsub = null; } } catch(e) {}
+            try { if (window.commentsUnsub) { window.commentsUnsub(); window.commentsUnsub = null; } } catch(e) {}
             document.getElementById('commentModal').classList.remove('active');
             document.getElementById('commentTextarea').value = '';
             removeCommentImage();
-            currentPostForComment = null;
+            window.currentPostForComment = null;
         }
         
         async function postComment() {
-            if (!currentUser || !currentPostForComment) return;
+            if (!currentUser || !window.currentPostForComment) return;
             
             const textarea = document.getElementById('commentTextarea');
             const text = textarea.value.trim();
             
-            if (!text && !selectedCommentImage) return;
+            if (!text && !window.selectedCommentImage) return;
             
             const commentButton = document.querySelector('.comment-button');
             commentButton.disabled = true;
@@ -4643,7 +4648,7 @@ async function loadFeed() {
             
             try {
                 // Add comment
-                const commentsRef = window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment);
+                const commentsRef = window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment);
                 const commentData = {
                     userId: currentUser.userId,
                     username: currentUser.username,
@@ -4656,24 +4661,24 @@ async function loadFeed() {
                 };
                 
                 // Add image if selected
-                if (selectedCommentImage) {
-                    commentData.image = selectedCommentImage;
+                if (window.selectedCommentImage) {
+                    commentData.image = window.selectedCommentImage;
                 }
                 
                 await window.firebasePush(commentsRef, commentData);
                 
                 // Increase comment count on post
-                const postRef = window.firebaseRef(window.firebaseDB, 'posts/' + currentPostForComment);
+                const postRef = window.firebaseRef(window.firebaseDB, 'posts/' + window.currentPostForComment);
                 const postSnap = await window.firebaseGet(postRef);
                 if (postSnap.exists()) {
                     const post = postSnap.val();
                     await window.firebaseSet(
-                        window.firebaseRef(window.firebaseDB, 'posts/' + currentPostForComment + '/comments'),
+                        window.firebaseRef(window.firebaseDB, 'posts/' + window.currentPostForComment + '/comments'),
                         (post.comments || 0) + 1
                     );
                 
                     // Notify post owner
-                    await createNotification(post.userId, 'comment', { postId: currentPostForComment, postSnippet: (post.text || '').slice(0, 120), commentSnippet: (text || '').slice(0, 120) });
+                    await createNotification(post.userId, 'comment', { postId: window.currentPostForComment, postSnippet: (post.text || '').slice(0, 120), commentSnippet: (text || '').slice(0, 120) });
                 }
                 
                 textarea.value = '';
@@ -4694,8 +4699,8 @@ async function loadFeed() {
                 const commentsRef = window.firebaseRef(window.firebaseDB, 'comments/' + postId);
                 
             try { if (feedUnsub) feedUnsub(); } catch(e) {}
-            feedUnsub = commentsUnsub && commentsUnsub();
-                commentsUnsub = window.firebaseOnValue(commentsRef, (snapshot) => {
+            feedUnsub = window.commentsUnsub && window.commentsUnsub();
+                window.commentsUnsub = window.firebaseOnValue(commentsRef, (snapshot) => {
                     const comments = [];
                     snapshot.forEach(s => {
                         comments.push({ id: s.key, ...s.val() });
@@ -4796,11 +4801,11 @@ async function loadFeed() {
         }
         
         async function likeComment(commentId) {
-            if (!currentUser || !currentPostForComment) return;
+            if (!currentUser || !window.currentPostForComment) return;
             
             try {
-                const commentRef = window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId);
-                const likeRef = window.firebaseRef(window.firebaseDB, 'commentLikes/' + currentPostForComment + '/' + commentId + '/' + currentUser.userId);
+                const commentRef = window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId);
+                const likeRef = window.firebaseRef(window.firebaseDB, 'commentLikes/' + window.currentPostForComment + '/' + commentId + '/' + currentUser.userId);
                 
                 // Check if already liked
                 const likeSnap = await window.firebaseGet(likeRef);
@@ -4814,7 +4819,7 @@ async function loadFeed() {
                     if (commentSnap.exists()) {
                         const comment = commentSnap.val();
                         await window.firebaseSet(
-                            window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId + '/likes'),
+                            window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId + '/likes'),
                             Math.max(0, (comment.likes || 0) - 1)
                         );
                     }
@@ -4830,7 +4835,7 @@ async function loadFeed() {
                     if (commentSnap.exists()) {
                         const comment = commentSnap.val();
                         await window.firebaseSet(
-                            window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId + '/likes'),
+                            window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId + '/likes'),
                             (comment.likes || 0) + 1
                         );
                     }
@@ -4844,11 +4849,11 @@ async function loadFeed() {
         }
         
         async function retweetComment(commentId) {
-            if (!currentUser || !currentPostForComment) return;
+            if (!currentUser || !window.currentPostForComment) return;
             
             try {
-                const commentRef = window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId);
-                const retweetRef = window.firebaseRef(window.firebaseDB, 'commentRetweets/' + currentPostForComment + '/' + commentId + '/' + currentUser.userId);
+                const commentRef = window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId);
+                const retweetRef = window.firebaseRef(window.firebaseDB, 'commentRetweets/' + window.currentPostForComment + '/' + commentId + '/' + currentUser.userId);
                 
                 // Check if already retweeted
                 const retweetSnap = await window.firebaseGet(retweetRef);
@@ -4862,7 +4867,7 @@ async function loadFeed() {
                     if (commentSnap.exists()) {
                         const comment = commentSnap.val();
                         await window.firebaseSet(
-                            window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId + '/reposts'),
+                            window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId + '/reposts'),
                             Math.max(0, (comment.reposts || 0) - 1)
                         );
                     }
@@ -4878,7 +4883,7 @@ async function loadFeed() {
                     if (commentSnap.exists()) {
                         const comment = commentSnap.val();
                         await window.firebaseSet(
-                            window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId + '/reposts'),
+                            window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId + '/reposts'),
                             (comment.reposts || 0) + 1
                         );
                     }
@@ -4914,7 +4919,7 @@ async function loadFeed() {
         }
         
         async function submitReply(commentId) {
-            if (!currentUser || !currentPostForComment) return;
+            if (!currentUser || !window.currentPostForComment) return;
             
             const textarea = document.getElementById('replyTextarea-' + commentId);
             const text = textarea.value.trim();
@@ -4923,7 +4928,7 @@ async function loadFeed() {
             
             try {
                 // Add reply to Firebase
-                const repliesRef = window.firebaseRef(window.firebaseDB, 'replies/' + currentPostForComment + '/' + commentId);
+                const repliesRef = window.firebaseRef(window.firebaseDB, 'replies/' + window.currentPostForComment + '/' + commentId);
                 const replyData = {
                     userId: currentUser.userId,
                     username: currentUser.username,
@@ -4936,12 +4941,12 @@ async function loadFeed() {
                 await window.firebasePush(repliesRef, replyData);
                 
                 // Increase reply count on comment
-                const commentRef = window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId);
+                const commentRef = window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId);
                 const commentSnap = await window.firebaseGet(commentRef);
                 if (commentSnap.exists()) {
                     const comment = commentSnap.val();
                     await window.firebaseSet(
-                        window.firebaseRef(window.firebaseDB, 'comments/' + currentPostForComment + '/' + commentId + '/replies'),
+                        window.firebaseRef(window.firebaseDB, 'comments/' + window.currentPostForComment + '/' + commentId + '/replies'),
                         (comment.replies || 0) + 1
                     );
                 }
@@ -4963,7 +4968,7 @@ async function loadFeed() {
         
         async function loadReplies(commentId) {
             try {
-                const repliesRef = window.firebaseRef(window.firebaseDB, 'replies/' + currentPostForComment + '/' + commentId);
+                const repliesRef = window.firebaseRef(window.firebaseDB, 'replies/' + window.currentPostForComment + '/' + commentId);
                 
                 const repliesSnap = await window.firebaseGet(repliesRef);
                 const repliesContainer = document.getElementById('replies-' + commentId);
@@ -6070,7 +6075,7 @@ async function loadFeed() {
                     if (!btn || btn.disabled) return;
 
                     const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 900);
-                    if (nearBottom && infiniteScrollArmed) {
+                    if (nearBottom && window.infiniteScrollArmed) {
                         armInfiniteScroll();
                         loadMoreFeed();
                     }
@@ -6110,10 +6115,10 @@ async function loadFeed() {
 
 
         // ===== MVP: Infinite scroll guard (v9) =====
-        let infiniteScrollArmed = true;
+        window.infiniteScrollArmed = true;
         function armInfiniteScroll(delay=900){
-            infiniteScrollArmed = false;
-            setTimeout(()=>{ infiniteScrollArmed = true; }, delay);
+            window.infiniteScrollArmed = false;
+            setTimeout(()=>{ window.infiniteScrollArmed = true; }, delay);
         }
 
 
@@ -6449,7 +6454,7 @@ async function loadFeed() {
 
 
         // ===== MVP: Real Trending from posts (v13) =====
-        let trendingUnsub = null;
+        window.trendingUnsub = window.trendingUnsub || null;
 
         function extractHashtags(text) {
             if (!text) return [];
@@ -6521,13 +6526,13 @@ async function loadFeed() {
 
         function startTrendingListener() {
             try {
-                if (trendingUnsub) { trendingUnsub(); trendingUnsub = null; }
+                if (window.trendingUnsub) { window.trendingUnsub(); window.trendingUnsub = null; }
 
                 const postsRef = window.firebaseRef(window.firebaseDB, 'posts');
                 // Use a larger window for trending than the feed.
                 const q = window.firebaseQuery(postsRef, window.firebaseOrderByChild('createdAt'), window.firebaseLimitToLast(500));
 
-                trendingUnsub = window.firebaseOnValue(q, (snap) => {
+                window.trendingUnsub = window.firebaseOnValue(q, (snap) => {
                     const obj = snap.exists() ? snap.val() : {};
                     computeTrendingFromPosts(obj);
                 }, (err) => {
