@@ -2746,7 +2746,7 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
         }
 
         async function hydrateOverlayAvatars() {
-            const imgs = document.querySelectorAll('#notificationsOverlayList img[data-actor-id]');
+            const imgs = document.querySelectorAll('.back-btn');
             const ids = Array.from(new Set(Array.from(imgs).map(img => img.getAttribute('data-actor-id')).filter(Boolean)));
             ids.forEach(async (id) => {
                 const url = await fetchAvatarForUser(id);
@@ -4427,6 +4427,8 @@ async function loadFeed() {
         }
 
         function switchPage(page) {
+            // ensure a default current page
+            if(!window.currentPage){ window.currentPage = 'home'; }
             try{
                 if(window.currentPage && page && page !== window.currentPage){
                     window.pageHistory = window.pageHistory || [];
@@ -7582,7 +7584,7 @@ async function hydrateCAs(root){
 // ===== Global Back button handling (all pages) =====
 function updateBackButtons(){
   const btns = document.querySelectorAll('#backBtn, .back-btn');
-  const canGoBack = Array.isArray(window._pageHistory) && window._pageHistory.length > 0;
+  const canGoBack = Array.isArray(window.pageHistory) && window.pageHistory.length > 0;
   btns.forEach(btn=>{
     if(!btn) return;
     btn.disabled = !canGoBack;
