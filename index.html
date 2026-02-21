@@ -1904,6 +1904,29 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
 }
 /* ===== End v4 ===== */
 
+
+/* ===== Global header actions (back + menu) ===== */
+.feed-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.header-actions{ display:flex; align-items:center; gap:10px; }
+.back-btn{
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: var(--text-white);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor:pointer;
+}
+.back-btn:active{ transform: translateY(1px); }
+.back-btn[disabled]{ opacity: .45; cursor: not-allowed; }
+@media (min-width: 901px){
+  /* keep back available on desktop too, but menu button hidden unless you want it */
+  .mobile-menu-btn{ display:none; }
+}
+@media (max-width: 900px){
+  .mobile-menu-btn{ display:inline-flex; align-items:center; justify-content:center; }
+}
+/* ===== End header actions ===== */
+
 </style>
 </head>
 <body>
@@ -2059,7 +2082,11 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
             <div id="homePage">
                 <div class="feed-header">
                     <h1 class="feed-title">Home</h1>
-                    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                    <div class="header-actions">
+                        <button class="back-btn" id="backBtn" onclick="goBack()" aria-label="Back">←</button>
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                    </div>
+                    
                 </div>
                 
                 <!-- Post Box -->
@@ -2223,6 +2250,10 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
 <div id="radarPage" style="display: none;">
     <div class="feed-header">
         <h1 class="feed-title">🚨 Early Radar</h1>
+                    <div class="header-actions">
+                        <button class="back-btn" id="backBtn" onclick="goBack()" aria-label="Back">←</button>
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                    </div>
     </div>
 
     <div style="padding: 14px 18px; opacity: 0.75; line-height: 1.45;">
@@ -2247,6 +2278,10 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
             <div id="trendingPage" style="display: none;">
                 <div class="feed-header">
                     <h1 class="feed-title">🔥 Trending</h1>
+                    <div class="header-actions">
+                        <button class="back-btn" id="backBtn" onclick="goBack()" aria-label="Back">←</button>
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                    </div>
                 </div>
 
                 <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
@@ -2272,6 +2307,10 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
             <div id="searchPage" style="display: none;">
                 <div class="feed-header">
                     <h1 class="feed-title">🔍 Search</h1>
+                    <div class="header-actions">
+                        <button class="back-btn" id="backBtn" onclick="goBack()" aria-label="Back">←</button>
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                    </div>
                 </div>
                 
                 <!-- Search Box -->
@@ -2397,6 +2436,10 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
             <div id="settingsPage" style="display: none;">
                 <div class="feed-header">
                     <h1 class="feed-title">⚙️ Settings</h1>
+                    <div class="header-actions">
+                        <button class="back-btn" id="backBtn" onclick="goBack()" aria-label="Back">←</button>
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                    </div>
                 </div>
                 <div style="padding: 40px; text-align: center; color: var(--text-white); opacity: 0.5;">
                     Coming soon! 🏴‍☠️
@@ -4459,6 +4502,8 @@ async function loadFeed() {
         
             // Close mobile sidebar after navigation
             try { document.body.classList.remove('mobile-sidebar-open'); } catch(e) {}
+
+  updateBackButtons();
 }
         
         async function loadProfile() {
@@ -7302,6 +7347,8 @@ function goBack(){
   }catch(e){}
   // fallback
   switchPage('home');
+
+  updateBackButtons();
 }
 
 
@@ -7531,6 +7578,23 @@ async function hydrateCAs(root){
 
   window.__compassHydrateCAs = hydrateCAs;
 })();
+
+// ===== Global Back button handling (all pages) =====
+function updateBackButtons(){
+  const btns = document.querySelectorAll('#backBtn, .back-btn');
+  const canGoBack = Array.isArray(window._pageHistory) && window._pageHistory.length > 0;
+  btns.forEach(btn=>{
+    if(!btn) return;
+    btn.disabled = !canGoBack;
+    btn.style.display = canGoBack ? '' : 'none';
+  });
+}
+// Call on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateBackButtons();
+});
+// ===== End Back handling =====
+
 </script>
 
 
