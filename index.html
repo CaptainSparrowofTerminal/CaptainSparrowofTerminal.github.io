@@ -1927,6 +1927,54 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
 }
 /* ===== End header actions ===== */
 
+
+/* ===== Mobile Gem Hunt Modal (v1) ===== */
+body.modal-open{ overflow:hidden; }
+.gem-mobile-modal{ position: fixed; inset: 0; z-index: 10040; display:none; }
+.gem-mobile-modal.show{ display:block; }
+.gem-mobile-backdrop{ position:absolute; inset:0; background: rgba(0,0,0,0.60); backdrop-filter: blur(6px); }
+.gem-mobile-panel{
+  position:absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  width: min(520px, calc(100vw - 24px));
+  background: rgba(10, 14, 39, 0.96);
+  border: 1px solid rgba(255, 0, 128, 0.25);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.65);
+  max-height: min(72vh, 560px);
+  overflow: auto;
+}
+.gem-mobile-header{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(10, 14, 39, 0.96);
+}
+.gem-mobile-title{ font-weight: 900; color: var(--primary-gold); font-size: 15px; letter-spacing: .2px; }
+.gem-mobile-close{
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-white);
+  cursor: pointer;
+}
+.gem-mobile-close:hover{ background: rgba(255,255,255,0.10); }
+.gem-mobile-body{ padding: 12px 12px 14px; }
+@media (min-width: 901px){
+  /* Desktop doesn't need the modal */
+  .gem-mobile-modal{ display:none !important; }
+}
+/* ===== End Mobile Gem Hunt Modal ===== */
+
 </style>
 </head>
 <body>
@@ -2529,6 +2577,7 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
                     <!-- Users will be loaded dynamically -->
                 </div>
 
+                <div id="gemHuntCardSlot">
                 <div class="gemhunt-card" id="gemHuntCard">
                     <div class="gemhunt-title">💎 GEM HUNT <span class="gemhunt-badge">(ALPHA)</span></div>
                     <div class="gemhunt-field">
@@ -2624,6 +2673,7 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
                     </div>
 
                     <div class="gemhunt-hint">Tip: This will post to your feed as a <b>#GEMHUNT</b> signal.</div>
+                </div>
                 </div>
 
             </div>
@@ -6722,14 +6772,68 @@ function openGemHuntPanel(){
     try{
         const card = document.getElementById('gemHuntCard');
         if(!card) return;
-        // ensure right sidebar is visible (we keep it on home)
+
+        const isMobile = window.matchMedia && window.matchMedia('(max-width: 900px)').matches;
+
+        if(isMobile){
+            // Move the existing Gem Hunt card into a mobile bottom-sheet modal
+            const modal = document.getElementById('gemMobileModal');
+            const body = document.getElementById('gemMobileBody');
+            const slot = document.getElementById('gemHuntCardSlot');
+            if(!modal || !body || !slot) return;
+
+            // Prevent duplicated nodes / keep state
+            if(card.parentElement !== body){
+                body.appendChild(card);
+            }
+
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+
+            // pulse + focus
+            card.classList.remove('gemhunt-pulse');
+            void card.offsetWidth;
+            card.classList.add('gemhunt-pulse');
+
+            const input = document.getElementById('gemContract') || document.getElementById('gemSticker');
+            try{ input && input.focus && input.focus(); }catch(e){}
+            return;
+        }
+
+        // Desktop: scroll to the card in right sidebar
         card.scrollIntoView({behavior:'smooth', block:'center'});
         card.classList.remove('gemhunt-pulse');
-        // reflow
         void card.offsetWidth;
         card.classList.add('gemhunt-pulse');
     }catch(e){}
 }
+
+function closeGemHuntModal(){
+    try{
+        const modal = document.getElementById('gemMobileModal');
+        const slot = document.getElementById('gemHuntCardSlot');
+        const card = document.getElementById('gemHuntCard');
+        if(modal) {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden','true');
+        }
+        document.body.classList.remove('modal-open');
+
+        // Move card back to its original slot so desktop layout stays intact
+        if(slot && card && card.parentElement !== slot){
+            slot.appendChild(card);
+        }
+    }catch(e){}
+}
+
+// Close modal on ESC
+document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+        const modal = document.getElementById('gemMobileModal');
+        if(modal && modal.classList.contains('show')) closeGemHuntModal();
+    }
+});
 
 function isLikelySolanaAddress(addr){
     if(!addr) return false;
@@ -6771,6 +6875,7 @@ function shareGemSignal(){
         if(stickerEl) stickerEl.value = '';
         if(contractEl) contractEl.value = '';
         showToast('Gem Hunt signal posted!');
+        try{ closeGemHuntModal(); }catch(e){}
         openGemHuntPanel();
     } else {
         showToast('Post box not available.');
@@ -7601,6 +7706,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     <div id="caTooltip" class="ca-tooltip"></div>
+
+
+    <!-- Mobile Gem Hunt Modal -->
+    <div class="gem-mobile-modal" id="gemMobileModal" aria-hidden="true">
+        <div class="gem-mobile-backdrop" onclick="closeGemHuntModal()"></div>
+        <div class="gem-mobile-panel" role="dialog" aria-modal="true" aria-label="Gem Hunt">
+            <div class="gem-mobile-header">
+                <div class="gem-mobile-title">💎 Gem Hunt</div>
+                <button class="gem-mobile-close" onclick="closeGemHuntModal()" aria-label="Close">✕</button>
+            </div>
+            <div class="gem-mobile-body" id="gemMobileBody"></div>
+        </div>
+    </div>
 
 </body>
 </html>
