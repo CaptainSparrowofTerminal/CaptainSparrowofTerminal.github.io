@@ -43,6 +43,8 @@
     window.commentsUnsub = window.commentsUnsub || null;
     window.trendingUnsub = window.trendingUnsub || null;
     window.infiniteScrollArmed = (typeof window.infiniteScrollArmed === 'boolean') ? window.infiniteScrollArmed : true;
+window.currentPage = window.currentPage || 'home';
+window.pageHistory = window.pageHistory || [];
 
     </script>
     
@@ -1884,6 +1886,24 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
   .mobile-close-sidebar:active{ transform: translateY(1px); }
 }
 
+
+/* ===== Mobile overflow + CA wrap + post stats tightening (v4) ===== */
+@media (max-width: 900px){
+  /* CA chips in posts / radar / gem blocks */
+  .ca-wrap{ display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:8px !important; max-width:100% !important; }
+  .contract-address{ max-width:100% !important; }
+  .analyze-ca{ white-space: nowrap; }
+  .copy-ca{ white-space: nowrap; }
+
+  /* Post stats row: prevent pushing outside viewport */
+  .post-stats{ gap: 16px !important; justify-content: space-between; flex-wrap: wrap; }
+  .post-stat{ padding: 6px 8px; }
+
+  /* Profile page padding hardening */
+  #profilePage, #userProfilePage{ max-width:100%; overflow-x:hidden; }
+}
+/* ===== End v4 ===== */
+
 </style>
 </head>
 <body>
@@ -2088,8 +2108,12 @@ img, video, canvas, svg{ max-width: 100%; height: auto; }
             
             <!-- Profile Page -->
             <div id="profilePage" style="display: none;">
-                <div class="feed-header">
-                    <h1 class="feed-title">Profile</h1>
+                <div class="feed-header" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+                        <button class="mobile-menu-btn" onclick="goBack()" aria-label="Back">←</button>
+                        <h1 class="feed-title" style="margin:0;">Profile</h1>
+                    </div>
                 </div>
                 
                 <div style="padding: 0;">
@@ -4360,6 +4384,13 @@ async function loadFeed() {
         }
 
         function switchPage(page) {
+            try{
+                if(window.currentPage && page && page !== window.currentPage){
+                    window.pageHistory = window.pageHistory || [];
+                    window.pageHistory.push(window.currentPage);
+                }
+                window.currentPage = page;
+            }catch(e){}
             // Hide all pages
             safeSetDisplay('homePage','none');
             safeSetDisplay('profilePage','none');
@@ -7259,6 +7290,20 @@ function toggleMobileSidebar(forceOpen){
   }catch(e){}
 }
 /* ===== End mobile sidebar toggle ===== */
+
+function goBack(){
+  try{
+    window.pageHistory = window.pageHistory || [];
+    const prev = window.pageHistory.pop();
+    if(prev){
+      switchPage(prev);
+      return;
+    }
+  }catch(e){}
+  // fallback
+  switchPage('home');
+}
+
 
 /* === GEM HUNT CA helpers (wrap + copy + shorten) === */
 (function(){
