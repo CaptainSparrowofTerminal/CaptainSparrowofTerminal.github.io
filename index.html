@@ -1975,6 +1975,10 @@ body.modal-open{ overflow:hidden; }
 }
 /* ===== End Mobile Gem Hunt Modal ===== */
 
+
+/* --- Fix: auth modal must be above gem mobile modal --- */
+.auth-modal{ z-index: 10080 !important; }
+
 </style>
 </head>
 <body>
@@ -3102,6 +3106,9 @@ if (n.type === 'like') return `${who} liked your post`;
         
         function showAuthModal() {
             document.getElementById('authModal').classList.remove('hidden');
+            try{ if(typeof closeGemHuntModal==='function') closeGemHuntModal(); }catch(e){}
+            try{ if(typeof toggleMobileSidebar==='function') toggleMobileSidebar(false); }catch(e){}
+
         }
         
         async function hideAuthModal() {
@@ -3550,7 +3557,7 @@ async function loadEarlyRadar(force = false){
                 const my = candidates[idx++];
                 const ca = my.ca;
                 try{
-                    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(ca)}`);
+                    const r = await fetchJsonWithTimeout(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(ca)}`, {}, 12000);
                     const d = await r.json();
                     const pair = (d?.pairs && d.pairs.length) ? d.pairs[0] : null;
                     if(!pair) continue;
@@ -6922,11 +6929,21 @@ function clearGemKeys(){
     showToast('Keys cleared.');
 }
 
+async function fetchJsonWithTimeout(url, options={}, timeoutMs=12000){
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+        const res = await fetch(url, { ...options, signal: ctrl.signal });
+        if(!res.ok) throw new Error(`Request failed (${res.status})`);
+        return await res.json();
+    } finally {
+        clearTimeout(t);
+    }
+}
+
 async function dexPairsForTokenSolana(mint){
     const url = `https://api.dexscreener.com/token-pairs/v1/solana/${mint}`;
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('DexScreener request failed');
-    const data = await res.json();
+    const data = await fetchJsonWithTimeout(url, {}, 12000);
     if(!Array.isArray(data) || data.length === 0) return [];
     return data;
 }
@@ -7184,7 +7201,7 @@ function renderTaToGemPanel(s){
 }
 // ===== End TA =====
 
-async async function analyzeGemHunt(){
+async function analyzeGemHunt(){
     const contractEl = document.getElementById('gemContract');
     const stickerEl = document.getElementById('gemSticker');
     const mint = (contractEl?.value || '').trim();
@@ -7197,6 +7214,7 @@ async async function analyzeGemHunt(){
     }
 
     setGemLoading(true, 'Fetching pools from DexScreener…');
+    const _slowTimer = setTimeout(()=>{ try{ setGemLoading(true, 'Still loading… (network slow)'); }catch(e){} }, 6500);
 
     try{
         const pairs = await dexPairsForTokenSolana(mint);
@@ -7348,6 +7366,7 @@ async async function analyzeGemHunt(){
         console.error('analyzeGemHunt error:', err);
         setGemError('Analysis failed. Try again, or check the contract address.');
     }finally{
+        try{ clearTimeout(_slowTimer); }catch(e){}
         setGemLoading(false);
     }
 }
@@ -7509,7 +7528,7 @@ function goBack(){
 
     // 2) Fallback to DexScreener token endpoint (public)
     try{
-      var r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + encodeURIComponent(key));
+      var r = await fetchJsonWithTimeout('https://api.dexscreener.com/latest/dex/tokens/' + encodeURIComponent(key), {}, 12000);
       if(!r.ok) throw new Error('dex ' + r.status);
       var j = await r.json();
       var pair = (j && j.pairs && j.pairs.length) ? j.pairs[0] : null;
