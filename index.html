@@ -1838,6 +1838,52 @@ html, body { width: 100%; overflow-x: hidden; }
 }
 /* ===== End mobile hard fix v1 ===== */
 
+
+/* ===== Mobile patch v2 (drawer text + overflow hardening) ===== */
+@media (max-width: 900px){
+  /* override older 768px rules that shrink sidebar + hide labels */
+  .sidebar{ width: min(340px, 86vw) !important; }
+  .nav-text{ display: inline !important; }
+  .user-info-sidebar{ display: block !important; }
+
+  /* make nav items comfortable touch targets */
+  .nav-item{ padding: 14px 16px !important; gap: 14px !important; }
+}
+
+/* Hard stop any horizontal scroll from nested elements */
+.main-container, .feed-section, #mainContent, #homePage, #profilePage{
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.post-box, .post{ max-width: 100%; }
+
+/* Ensure any absolute/long content can't push width */
+img, video, canvas, svg{ max-width: 100%; height: auto; }
+/* ===== End Mobile patch v2 ===== */
+
+
+
+@media (max-width: 900px){
+  .logo-section{ position: relative; }
+  .mobile-close-sidebar{
+    display: inline-flex;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.06);
+    color: var(--text-white);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .mobile-close-sidebar:active{ transform: translateY(1px); }
+}
+
 </style>
 </head>
 <body>
@@ -1892,6 +1938,8 @@ html, body { width: 100%; overflow-x: hidden; }
                     COMPASS 🧭
                 </div>
                 <div class="logo-subtitle">Solana's Pirate Social Network</div>
+                <button class="mobile-close-sidebar" onclick="toggleMobileSidebar(false)" aria-label="Close menu">✕</button>
+
             </div>
             
             <ul class="nav-menu">
@@ -4377,7 +4425,10 @@ async function loadFeed() {
                 safeSetDisplay('settingsPage','block');
                 _activateNavByPage('settings');
             }
-        }
+        
+            // Close mobile sidebar after navigation
+            try { document.body.classList.remove('mobile-sidebar-open'); } catch(e) {}
+}
         
         async function loadProfile() {
             if (!currentUser) return;
