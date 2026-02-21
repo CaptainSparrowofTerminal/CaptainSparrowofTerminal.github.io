@@ -1797,6 +1797,47 @@
   #gemChartIframe{ height: 320px; }
 }
 
+
+/* ===== Mobile-first hard fix for current layout (main-container based) v1 ===== */
+html, body { width: 100%; overflow-x: hidden; }
+.main-container { width: 100%; }
+
+/* Feed column never exceed viewport */
+.feed-section { width: 100%; max-width: 100%; min-width: 0; }
+
+/* Make cards and headers not push outside screen */
+.feed-header, .post-box, .post, .comment-modal-content { max-width: 100%; }
+.post { min-width: 0; }
+.post-text, .post-textarea { overflow-wrap: anywhere; word-break: break-word; }
+
+@media (max-width: 900px){
+  /* Stack layout (no 3 columns) */
+  .main-container{
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  /* Hide right sidebar earlier */
+  .right-sidebar{ display: none !important; }
+
+  /* Sidebar already drawer; ensure background matches theme */
+  .sidebar{
+    background: rgba(10, 14, 39, 0.98);
+  }
+
+  /* Remove desktop borders that squeeze content */
+  .feed-section{ border-right: none; }
+
+  /* Fix spacing so Post button doesn't go off-screen */
+  .post-actions{ gap: 10px; flex-wrap: wrap; }
+  .post-button{ width: 100%; border-radius: 14px; }
+
+  /* Tighten margins */
+  .post-box{ margin: 10px 10px; }
+  .feed-posts{ padding: 10px; }
+}
+/* ===== End mobile hard fix v1 ===== */
+
 </style>
 </head>
 <body>
@@ -7157,6 +7198,17 @@ TP: ${taTP}
 <div id="netBanner" class="net-banner">You are offline. Some features may not work.</div>
 
 <script>
+
+/* ===== Mobile sidebar toggle (missing helper) ===== */
+function toggleMobileSidebar(forceOpen){
+  try{
+    if(forceOpen === true) document.body.classList.add('mobile-sidebar-open');
+    else if(forceOpen === false) document.body.classList.remove('mobile-sidebar-open');
+    else document.body.classList.toggle('mobile-sidebar-open');
+  }catch(e){}
+}
+/* ===== End mobile sidebar toggle ===== */
+
 /* === GEM HUNT CA helpers (wrap + copy + shorten) === */
 (function(){
   function shortenCA(s){
